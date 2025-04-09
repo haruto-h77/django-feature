@@ -11,11 +11,13 @@
                     {% else %}
                 <td>
             {% endif %}
+            <a href="{% url 'app:mycalendar' day.year day.month day.day %}">
         {% if week_first.month != day.month %}
             {{ day | date:"m/d" }}
         {% else %}
             {{ day.day }}
         {% endif %}
+        </a>
         </td>
         {% endfor %}
     </tr>

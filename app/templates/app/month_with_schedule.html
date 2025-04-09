@@ -5,7 +5,7 @@
             table-layout: fixed;
         }
 
-        td > div {
+        td > a > div {
             height: 100px;
             overflow: hidden;
             white-space: nowrap;
@@ -52,18 +52,18 @@
                             {% else %}
                         <td>
                     {% endif %}
-
-                <div>
-                    {% if month_current.month != day.month %}
-                        {{ day | date:"m/d" }}
-                    {% else %}
-                        {{ day.day }}
-                    {% endif %}
-
-                    {% for schedule in schedules %}
-                        <p>{{ schedule.summary }}</p>
-                    {% endfor %}
-                </div>
+                <a href="{% url 'app:mycalendar' day.year day.month day.day %}">
+                    <div>
+                        {% if month_current.month != day.month %}
+                            {{ day | date:"m/d" }}
+                        {% else %}
+                            {{ day.day }}
+                        {% endif %}
+                        {% for schedule in schedules %}
+                            <p>{{ schedule.summary }}</p>
+                        {% endfor %}
+                    </div>
+                </a>
                 </td>
                 {% endfor %}
             </tr>

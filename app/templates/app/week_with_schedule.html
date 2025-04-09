@@ -23,11 +23,13 @@
                 {% else %}
                     <td>
                 {% endif %}
-            {% if week_first.month != day.month %}
-                {{ day | date:"m/d" }}
-            {% else %}
-                {{ day.day }}
-            {% endif %}
+            <a href="{% url 'app:mycalendar' day.year day.month day.day %}">
+                {% if week_first.month != day.month %}
+                    {{ day | date:"m/d" }}
+                {% else %}
+                    {{ day.day }}
+                {% endif %}
+            </a>
             </td>
             {% endfor %}
         </tr>
@@ -35,9 +37,11 @@
             {% for schedules in week_day_schedules.values %}
                 <td>
                     {% for s in schedules %}
+                    
                         {{ s.start_time }} - {{ s.end_time }}<br>
                         {{ s.summary }}<br>
                         {{ s.description | linebreaks }}
+                    
                     {% endfor %}
                 </td>
             {% endfor %}
