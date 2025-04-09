@@ -1,6 +1,8 @@
 {% extends 'app/base.html' %}
 {% block content %}
 
+    <a href="{% url 'app:month_with_schedule' month_current.year month_current.month %}">月表示に切り替え</a>
+    <br>
     <a href="{% url 'app:week_with_schedule' week_previous.year week_previous.month  week_previous.day %}">前週</a>
     {{ week_first | date:"Y年m月d日" }}〜{{ week_last | date:"Y年m月d日" }}
     <a href="{% url 'app:week_with_schedule' week_next.year week_next.month  week_next.day %}">次週</a>

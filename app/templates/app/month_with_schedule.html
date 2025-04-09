@@ -12,9 +12,12 @@
         }
 
     </style>
-    <a href="{% url 'app:month_with_schedule' month_previous.year month_previous.month %}">前月</a>
+    <a href="{% url 'app:week_with_schedule' month_current.year month_current.month now.day %}">週表示に切り替え</a>
+    <br>
+    <a href="{% url 'app:month_with_schedule' month_prev_year.year month_current.month %}">前年</a>
     {{ month_current | date:"Y年m月" }}
-    <a href="{% url 'app:month_with_schedule' month_next.year month_next.month %}">次月</a>
+    <a href="{% url 'app:month_with_schedule' month_next_year.year month_current.month %}">来年</a>
+    <br>
 
     <table class="table">
         <thead>

@@ -2,7 +2,7 @@ import datetime
 from django.db import models
 from django.utils import timezone
 
-
+# Domainの役割
 class Schedule(models.Model):
     """スケジュール"""
     summary = models.CharField('概要', max_length=50)

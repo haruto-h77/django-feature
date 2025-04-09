@@ -68,6 +68,8 @@ class MonthCalendarMixin(BaseCalendarMixin):
             'month_current': current_month,
             'month_previous': self.get_previous_month(current_month),
             'month_next': self.get_next_month(current_month),
+            'month_prev_year': current_month.replace(year=current_month.year - 1),
+            'month_next_year': current_month.replace(year=current_month.year + 1),
             'week_names': self.get_week_names(),
         }
         return calendar_data
@@ -104,6 +106,7 @@ class WeekCalendarMixin(BaseCalendarMixin):
             'week_names': self.get_week_names(),
             'week_first': first,
             'week_last': last,
+            'month_current': first,
         }
         return calendar_data
 

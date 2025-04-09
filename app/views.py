@@ -63,6 +63,7 @@ class MyCalendar(mixins.MonthCalendarMixin, mixins.WeekWithScheduleMixin, generi
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        
         week_calendar_context = self.get_week_calendar()
         month_calendar_context = self.get_month_calendar()
         context.update(week_calendar_context)
