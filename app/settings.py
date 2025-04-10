@@ -8,6 +8,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',      # セッション管理
     'django.contrib.messages',      # メッセージフレームワーク
     'django.contrib.staticfiles',   # CSSや画像などの静的ファイルの取り扱い
+    'app',
 ]
 
 
