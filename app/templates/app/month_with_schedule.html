@@ -1,5 +1,6 @@
 {% extends 'app/base.html' %}
 {% block content %}
+{% load app_tags %}
     <style>
         table {
             table-layout: fixed;
@@ -30,7 +31,7 @@
                     {% if month_current.month == month_num %}style="font-weight: bold;"{% endif %}>
                     {{ month_num }}月
                 </a>
-                {% if not forloop.last %} | {% endif %} {# 月の間に区切り文字を追加 #}
+                {% if not forloop.last %} | {% endif %} 
             {% endfor %}
         </span>
     </div>
@@ -39,35 +40,49 @@
         <thead>
         <tr>
             {% for w in week_names %}
-                <th>{{ w }}</th>
+                <th>{{ w }}</th> 
             {% endfor %}
         </tr>
         </thead>
         <tbody>
-        {% for week_day_schedles in month_day_schedules %}
-            <tr>
-                {% for day, schedules in week_day_schedles.items %}
-                    {% if now == day %}
-                        <td class="table-success">
-                            {% else %}
-                        <td>
-                    {% endif %}
-                <a href="{% url 'app:mycalendar' day.year day.month day.day %}">
-                    <div>
-                        {% if month_current.month != day.month %}
-                            {{ day | date:"m/d" }}
-                        {% else %}
-                            {{ day.day }}
-                        {% endif %}
-                        {% for schedule in schedules %}
-                            <p>{{ schedule.summary }}</p>
-                        {% endfor %}
-                    </div>
-                </a>
-                </td>
-                {% endfor %}
-            </tr>
-        {% endfor %}
+            {% for week_day_schedules in month_day_schedules %}
+                <tr>
+                    {% for day, schedules in week_day_schedules.items %}
+                        <!-- is_holiday フィルタで祝日か判定 -->
+                        {% with is_holiday_today=month_holidays|is_holiday:day %}
+                        
+                        <td class="
+                            {% if now == day %}table-success{% endif %}
+                        ">
+                            <a href="{% url 'app:mycalendar' day.year day.month day.day %}" style="text-decoration: none; color: inherit; display: block; height: 100%;">
+                                <div>
+                                    <!-- 日付表示 -->
+                                    {% if month_current.month != day.month %}
+                                        {{ day | date:"m/d" }}
+                                    {% else %}
+                                        {{ day.day }}
+                                    {% endif %}
+                                    <!-- 祝日なら名前を表示 -->
+                                    {% if is_holiday_today %}
+                                        {% with holiday_name=month_holidays|get_item:day %}
+                                            {% if holiday_name %}
+                                                <span style="color: red; font-size: 0.8em; display: block;">{{ holiday_name }}</span>
+                                            {% endif %}
+                                        {% endwith %}
+                                    {% endif %}
+                                    <!-- スケジュール表示 -->
+                                    {% for schedule in schedules %}
+                                        <p>{{ schedule.summary }}</p>
+                                    {% endfor %}
+                                </div>
+                            </a>
+                        </td>
+                        {% endwith %}
+                    {% endfor %}
+                </tr>
+            {% endfor %}
         </tbody>
+        
     </table>
+
 {% endblock %}

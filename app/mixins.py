@@ -3,6 +3,8 @@ from collections import deque
 import datetime
 import itertools
 from django import forms
+import jpholiday
+
 
 
 class BaseCalendarMixin:
@@ -91,6 +93,38 @@ class WeekCalendarMixin(BaseCalendarMixin):
         for week in self._calendar.monthdatescalendar(date.year, date.month):
             if date in week:  # 週ごとに取り出され、中身は全てdatetime.date型。該当の日が含まれていれば、それが今回表示すべき週です
                 return week
+            
+    def get_week_holidays(self, days):
+        """
+        指定された週(days: dateオブジェクトのリスト)に含まれる祝日を
+        {日付: 祝日名} の辞書で返す
+        """
+        holidays_dict = {}
+        if not days:
+            return holidays_dict
+
+        first_day = days[0]
+        last_day = days[-1]
+
+        # 週が月をまたぐ場合を考慮して、開始月と終了月の祝日を取得
+        months_to_check = set([(first_day.year, first_day.month)])
+        if first_day.month != last_day.month:
+            months_to_check.add((last_day.year, last_day.month))
+
+        all_holidays = {}
+        for year, month in months_to_check:
+            try:
+                month_hols = jpholiday.month_holidays(year, month)
+                for dt, name in month_hols:
+                    all_holidays[dt] = name
+            except ValueError:
+                continue # 対応していない年などはスキップ
+
+        # 取得した祝日から、該当週に含まれるものだけを抽出
+        for day in days:
+            if day in all_holidays:
+                holidays_dict[day] = all_holidays[day]
+        return holidays_dict
 
     def get_week_calendar(self):
         """週間カレンダー情報の入った辞書を返す"""
@@ -106,8 +140,10 @@ class WeekCalendarMixin(BaseCalendarMixin):
             'week_names': self.get_week_names(),
             'week_first': first,
             'week_last': last,
-            'month_current': first,
+            'month_current': first.replace(day=1),
         }
+        
+        calendar_data['week_holidays'] = self.get_week_holidays(days)
         return calendar_data
 
 
@@ -129,19 +165,57 @@ class WeekWithScheduleMixin(WeekCalendarMixin):
             schedule_date = getattr(schedule, self.date_field)
             day_schedules[schedule_date].append(schedule)
         return day_schedules
+    
+    def get_week_holidays(self, days):
+        """
+        指定された週(days: dateオブジェクトのリスト)に含まれる祝日を
+        {日付: 祝日名} の辞書で返す
+        """
+        holidays_dict = {}
+        if not days:
+            return holidays_dict
+
+        first_day = days[0]
+        last_day = days[-1]
+
+        # 週が月をまたぐ場合を考慮して、開始月と終了月の祝日を取得
+        months_to_check = set([(first_day.year, first_day.month)])
+        if first_day.month != last_day.month:
+            months_to_check.add((last_day.year, last_day.month))
+
+        all_holidays = {}
+        for year, month in months_to_check:
+            try:
+                month_hols = jpholiday.month_holidays(year, month)
+                for dt, name in month_hols:
+                    all_holidays[dt] = name
+            except ValueError:
+                continue # 対応していない年などはスキップ
+
+        # 取得した祝日から、該当週に含まれるものだけを抽出
+        for day in days:
+            if day in all_holidays:
+                holidays_dict[day] = all_holidays[day]
+
+        return holidays_dict
 
     def get_week_calendar(self):
         calendar_context = super().get_week_calendar()
+        week_days = calendar_context['week_days']
         calendar_context['week_day_schedules'] = self.get_week_schedules(
             calendar_context['week_first'],
             calendar_context['week_last'],
-            calendar_context['week_days']
+            week_days
         )
+        # 祝日取得処理
+        calendar_context['week_holidays'] = self.get_week_holidays(week_days)
         return calendar_context
 
 
 class MonthWithScheduleMixin(MonthCalendarMixin):
     """スケジュール付きの、月間カレンダーを提供するMixin"""
+    
+    date_field = 'date'
 
     def get_month_schedules(self, start, end, days):
         """それぞれの日とスケジュールを返す"""
@@ -156,23 +230,56 @@ class MonthWithScheduleMixin(MonthCalendarMixin):
         day_schedules = {day: [] for week in days for day in week}
         for schedule in queryset:
             schedule_date = getattr(schedule, self.date_field)
-            day_schedules[schedule_date].append(schedule)
+            if schedule_date in day_schedules:
+                day_schedules[schedule_date].append(schedule)
 
         # day_schedules辞書を、周毎に分割する。[{1日: 1日のスケジュール...}, {8日: 8日のスケジュール...}, ...]
         # 7個ずつ取り出して分割しています。
+        day_items = list(day_schedules.items())
         size = len(day_schedules)
         return [{key: day_schedules[key] for key in itertools.islice(day_schedules, i, i+7)} for i in range(0, size, 7)]
+    
+    def get_month_holidays(self, year, month):
+        """指定された年月の祝日を {日付: 祝日名} の辞書で返す"""
+        try:
+            # jpholiday.month_holidays は (datetime.date, 祝日名) のタプルのリストを返す
+            holidays_tuple = jpholiday.month_holidays(year, month)
+            # 日付(dateオブジェクト)をキー、祝日名を値とする辞書に変換
+            holidays_dict = {date: name for date, name in holidays_tuple}
+            return holidays_dict
+        except ValueError:
+            return {}
+    
 
     def get_month_calendar(self):
         calendar_context = super().get_month_calendar()
         month_days = calendar_context['month_days']
+        # 空でないことを確認
+        if not month_days or not month_days[0]:
+            calendar_context['month_day_schedules'] = []
+            calendar_context['month_holidays'] = {}
+            return calendar_context
+
         month_first = month_days[0][0]
         month_last = month_days[-1][-1]
+
+        # スケジュール取得
         calendar_context['month_day_schedules'] = self.get_month_schedules(
             month_first,
             month_last,
             month_days
         )
+
+        # 祝日取得処理
+        holidays_dict = {}
+        date_cursor = month_first
+        # 1日ずつ進めながら祝日を取得
+        while date_cursor <= month_last:
+            holidays_dict.update(self.get_month_holidays(date_cursor.year, date_cursor.month))
+            date_cursor += datetime.timedelta(days=1)
+
+            calendar_context['month_holidays'] = holidays_dict
+
         return calendar_context
 
 
