@@ -40,7 +40,7 @@
                     
                         {{ s.start_time }} - {{ s.end_time }}<br>
                         {{ s.summary }}<br>
-                        {{ s.description | linebreaks }}
+                        {{ s.description | urlize | linebreaks }}
                     
                     {% endfor %}
                 </td>
