@@ -124,3 +124,16 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# remainder
+# Email settings for Mailpit
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'localhost'  # Mailpitのホスト
+EMAIL_PORT = 1025         # Mailpitのデフォルトポート
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = False
+
+CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Redisを使用する
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'  # 結果をRedisに保存
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
