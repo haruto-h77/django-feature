@@ -108,10 +108,6 @@ class MyCalendar(mixins.MonthCalendarMixin, mixins.WeekWithScheduleMixin, generi
         return context
 
     def form_valid(self, form):
-        # month = self.kwargs.get('month')
-        # year = self.kwargs.get('year')
-        # day = self.kwargs.get('day')     
-        # フォームからstart_date, end_dateを取得
         start_date = form.cleaned_data['start_date']
         end_date = form.cleaned_data['end_date']
         summary = form.cleaned_data['summary']
@@ -120,7 +116,7 @@ class MyCalendar(mixins.MonthCalendarMixin, mixins.WeekWithScheduleMixin, generi
         # 日付が一致する場合（単一日付の場合）も考慮して、開始日から終了日までの間の日を登録
         current_date = start_date
         while current_date <= end_date:
-                    # 毎回新しいScheduleインスタンスを作成
+            # 毎回新しいScheduleインスタンスを作成
             schedule = Schedule(
                 summary=summary,
                 description=description,
@@ -128,19 +124,8 @@ class MyCalendar(mixins.MonthCalendarMixin, mixins.WeekWithScheduleMixin, generi
                 start_date=start_date,
                 end_date=end_date,
             )
-            # schedule = form.save(commit=False)
-            # schedule.date = current_date  # ここで現在の日付をセット
-            # schedule.start_date = start_date
-            # schedule.end_date = end_date
             schedule.save()
             current_date += timedelta(days=1)  # 1日ずつ増加
-        # if month and year and day:
-        #     date = datetime.date(year=int(year), month=int(month), day=int(day))
-        # else:
-        #     date = datetime.date.today()
-        # schedule = form.save(commit=False)
-        # schedule.date = date
-        # schedule.save()
         return redirect('app:mycalendar', year=start_date.year, month=start_date.month, day=start_date.day)
 
 
