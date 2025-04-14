@@ -23,7 +23,7 @@ def schedule_reminder_task(sender, instance, created, **kwargs):
                 eta=reminder_time
             )
         # 条件2: 現在時刻が開始時刻の30分前以降かつ開始時刻より前の場合
-        elif reminder_time <= current_time < scheduled_datetime:
+        elif reminder_time <= current_time <= scheduled_datetime:
             send_reminder.apply_async(
                 args=[instance.id]
             )

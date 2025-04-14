@@ -5,12 +5,16 @@ from django.utils import timezone
 # Domainの役割
 class Schedule(models.Model):
     """スケジュール"""
-    summary = models.CharField('概要', max_length=50)
-    description = models.TextField('詳細な説明', blank=True)
+    summary = models.CharField('タイトル')
+    description = models.TextField('内容', blank=True)
     start_time = models.TimeField('開始時間', default=datetime.time(7, 0, 0))
     end_time = models.TimeField('終了時間', default=datetime.time(7, 0, 0))
     date = models.DateField('日付')
     created_at = models.DateTimeField('作成日', default=timezone.now)
+    start_date = models.DateField('開始日', default=timezone.now)
+    end_date = models.DateField('終了日', default=timezone.now)
+    user_id = models.IntegerField('ユーザーID', default=1)
+    project_id = models.IntegerField('プロジェクトID', default=1)    
 
     def __str__(self):
         return self.summary

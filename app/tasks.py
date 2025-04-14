@@ -11,13 +11,26 @@ logger = logging.getLogger(__name__)
 def send_reminder(schedule_id):
     try:
         schedule = Schedule.objects.get(id=schedule_id)
+        
+        # 時間をh時m分形式に変換
+        start_time = schedule.start_time.strftime("%-H時%M分")  # %-H, %-Mでゼロ埋めを省略
+        end_time = schedule.end_time.strftime("%-H時%M分")
+        
+        # メール本文をカスタマイズ
+        message = (
+            f"予定名: {schedule.summary}\n"
+            f"説明: {schedule.description}\n"
+            f"予定開始日時: {schedule.date} {start_time}\n"
+            f"予定終了日時: {schedule.date} {end_time}\n\n"
+        )
+        
         # メールを送信
         send_mail(
-            f"Reminder: {schedule.summary}",
-            schedule.description,
-            'from@example.com',
-            ['to@example.com'],
+            f"Reminder: {schedule.summary}",  # 件名
+            message,  # 本文
+            'from@example.com',  # 送信元
+            ['to@example.com'],  # 送信先
             fail_silently=False,
         )
     except Schedule.DoesNotExist:
-        pass
+        logger.warning(f"Schedule with id {schedule_id} does not exist. Reminder not sent.")
