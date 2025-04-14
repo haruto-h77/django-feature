@@ -1,11 +1,12 @@
 from collections import defaultdict
 from datetime import timedelta
 import datetime
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.views import generic
 from .forms import BS4ScheduleForm, SimpleScheduleForm
 from .models import Schedule
 from . import mixins
+from .forms import ScheduleDetailForm 
 from django.urls import reverse
 from datetime import timedelta, time
 
@@ -168,3 +169,61 @@ class MonthWithFormsCalendar(mixins.MonthWithFormsMixin, generic.View):
             return redirect('app:month_with_forms')
 
         return render(request, self.template_name, context)
+
+class DayCalendar(mixins.WeekWithScheduleMixin, generic.TemplateView):
+    """スケジュール付きの日間カレンダーを表示するビュー"""
+    template_name = 'app/day.html'
+    model = Schedule
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        year = self.kwargs.get('year')
+        month = self.kwargs.get('month')
+        day = self.kwargs.get('day')
+        pk = self.kwargs.get('pk')
+        schedule = get_object_or_404(Schedule, pk=pk, date__year=year, date__month=month, date__day=day)
+        context['schedule'] = schedule
+        
+        try:
+            current_day_date = datetime.date(year, month, day)
+            # コンテキストに 'current_day_date' という名前で追加
+            context['current_day_date'] = current_day_date
+        except ValueError:
+            # URLの日付が無効な場合の処理 (通常はURLパターンで防がれる)
+            context['current_day_date'] = None # または Http404 を発生させるなど
+        return context
+
+# 編集処理
+def schedule_edit(request, pk):
+    schedule = get_object_or_404(Schedule, pk=pk)
+
+    if request.method == 'POST':
+        form = ScheduleDetailForm(request.POST, instance=schedule)
+        if form.is_valid():
+            schedule = form.save()
+            return redirect(reverse('app:month_with_schedule', kwargs={
+                'year': schedule.date.year,
+                'month': schedule.date.month,
+            }))
+        else:
+            print(form.errors)
+            context = {'form': form, 'schedule': schedule}
+            return render(request, 'app/day.html', context)
+
+    else:
+        form = ScheduleDetailForm(instance=schedule)
+        context = {'form': form, 'schedule': schedule}
+        return render(request, 'app/day.html', context)
+
+# 削除処理
+def schedule_delete(request, pk):
+    schedule = get_object_or_404(Schedule, pk=pk)
+    if request.method == 'POST':
+        date = schedule.date # 削除前に日付を保持
+        schedule.delete()
+        return redirect(reverse('app:month_with_schedule', kwargs={
+            'year': date.year,
+            'month': date.month,
+        }))
+    # POST 以外のリクエストに対する処理(POST以外だとNoneを返してしまうため)
+    return redirect(reverse('app:month_with_schedule', kwargs={'year': schedule.date.year, 'month': schedule.date.month})) # 例: GETなら月表示へ
