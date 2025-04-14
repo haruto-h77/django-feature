@@ -1,0 +1,32 @@
+{% extends 'todo/base.html' %}
+
+{% block content %}
+    <div class="container">
+      <div class="row my-2 justify-content-center">
+        <div class="col-sm-6 alert alert-info">
+            作業を{{ crud }}してください
+        </div>
+      </div>
+      <div class="row my-2 justify-content-center">
+        <div class="col-sm-6">
+          <form method="POST" class="todo-form"">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            {% for field in form %}
+              {% if not field.is_hidden %}
+                <div class="mb-3">
+                  {{ field.label_tag }}
+                  {{ field }}
+                  {{ field.errors }}
+                </div>
+              {% else %}
+                {{ field }}
+              {% endif %}
+            {% endfor %}
+            <button type="submit" class="save btn btn-primary">{{ crud }}</button>
+            <input type="button" value="キャンセル" class="btn btn-outline-primary" onclick="location.href='../';">
+          </form>
+        </div>
+      </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends 'todo/base.html' %}
+{% block content %}
+  <div class="container">
+    <table class="table table-striped table-hover table-sm my-2">
+      <thead>
+        <tr>
+          <th scope="col">項目名</th>
+          <th scope="col">担当者</th>
+          <th scope="col">登録日</th>
+          <th scope="col">期限日</th>
+          <th scope="col">完了日</th>
+          <th scope="col">操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for todo in todos %}
+        {% if not todo.is_deleted %}
+          {% if todo.finished_date != null %}
+          <tr class="finish">
+          {% elif todo.expire %}
+          <tr class="expire">
+          {% else %}
+          <tr>
+          {% endif %}
+            <td class="align-middle">{{ todo.item_name }}</td>
+            <td class="align-middle">{{ todo.user }}</td>
+            <td class="align-middle">{{ todo.registration_date | date:'Y/m/d' }}</td>
+            <td class="align-middle">{{ todo.expire_date | date:'Y/m/d' }}</td>
+            <td class="align-middle">{{ todo.finished_date | date:'Y/m/d' }}</td>
+            <td class="align-middle button">
+              <form method="POST" class="side" action="{% url 'complete' %}">
+                {% csrf_token %}
+                <input type="hidden" name="id" value='{{todo.pk}}'>
+                <button class="btn btn-primary">完了</button>
+              </form>
+              <button type=“button” class="btn btn-success side" onclick="location.href='{% url "edit" pk=todo.pk %}'">編集</button>
+              <form method="POST" class="side" action="{% url 'delete' %}">
+                {% csrf_token %}
+                <input type="hidden" name="id" value='{{todo.pk}}'>
+                <button class="btn btn-danger">削除</button>
+              </form>
+            </td>
+          </tr>
+        {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+    {% if search is not None %}
+      <input type="button" value="戻る" class="btn btn-outline-primary" onclick="location.href='/';">
+    {% endif %}
+  </div>
+{% endblock %}

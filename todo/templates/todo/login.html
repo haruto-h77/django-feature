@@ -1,0 +1,30 @@
+{% extends 'todo/base.html' %}
+
+{% block content %}
+  <div class="container">
+    <div class="row my-2 justify-content-center">
+      <div class="col-sm-6">
+        <form method="post" action="">
+          {% csrf_token %}
+          {{ form.non_field_errors }}
+          {% for field in form %}
+            {% if not field.is_hidden %}
+              <div class="form-group">
+                {{ field.label_tag }}
+                {{ field }}
+                {{ field.errors }}
+              </div>
+            {% else %}
+              {{ field }}
+            {% endif %}
+          {% endfor %}
+          <button type="submit" class="save btn btn-primary">{{ crud }}</button>
+          {% if crud == '新規登録' %}
+            <input type="button" value="キャンセル" class="btn btn-outline-primary" onclick="location.href='../';">
+          {% endif %}
+        </form>
+        <p>{{ message }}</p>
+      </div>
+    </div>
+  </div>
+{% endblock %}
