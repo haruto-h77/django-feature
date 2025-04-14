@@ -1,25 +1,54 @@
-<form method="post" action="{% url 'app:schedule_edit' schedule.pk %}">
-    {% csrf_token %}
+{% extends 'app/base.html' %} 
 
-    <label>タイトル:</label><br>
-    <input type="text" name="summary" value="{{ schedule.summary }}"><br><br>
+{% block content %}
+<div class="container mt-4">
+    <h2>スケジュール編集</h2>
 
-    <label>内容:</label><br>
-    <textarea name="description" rows="3">{{ schedule.description }}</textarea><br><br>
+    <form method="post" action="{% url 'app:schedule_edit' schedule.pk %}">
+        {% csrf_token %}
 
-    <label>日付:</label><br>
-    <input type="date" name="date" value="{{ current_day_date|date:'Y-m-d' }}"><br><br>
+        <div class="mb-3">
+            <label for="id_summary" class="form-label">タイトル:</label>
+            <input type="text" name="summary" value="{{ schedule.summary }}" class="form-control" id="id_summary" required>
+        </div>
 
-    <label>開始時間:</label><br>
-    <input type="time" name="start_time" value="{{ schedule.start_time|time:'H:i' }}"><br><br>
+        <div class="mb-3">
+            <label for="id_description" class="form-label">内容:</label>
+            <textarea name="description" rows="3" class="form-control" id="id_description">{{ schedule.description }}</textarea>
+        </div>
 
-    <label>終了時間:</label><br>
-    <input type="time" name="end_time" value="{{ schedule.end_time|time:'H:i' }}"><br><br>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="id_date" class="form-label">日付:</label>
+                <input type="date" name="date" value="{{ current_day_date|date:'Y-m-d' }}" class="form-control" id="id_date" required>
+            </div>
+        </div>
 
-    <button type="submit">保存</button>
-</form>
-<!-- 削除フォーム（POST） -->
-<form method="post" action="{% url 'app:schedule_delete' schedule.pk %}" style="margin-top: 1em;">
-    {% csrf_token %}
-    <button type="submit" onclick="return confirm('本当に削除しますか？')">削除</button>
-</form>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="id_start_time" class="form-label">開始時間:</label>
+                <input type="time" name="start_time" value="{{ schedule.start_time|time:'H:i' }}" class="form-control" id="id_start_time" required>
+            </div>
+            <div class="col-md-6">
+                <label for="id_end_time" class="form-label">終了時間:</label>
+                <input type="time" name="end_time" value="{{ schedule.end_time|time:'H:i' }}" class="form-control" id="id_end_time" required>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center">
+            <button type="submit" class="btn btn-primary">保存</button>
+
+            <form method="post" action="{% url 'app:schedule_delete' schedule.pk %}" class="d-inline" onsubmit="return confirm('本当に削除しますか？')">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">削除</button>
+            </form>
+        </div>
+
+    </form>
+
+    <div class="mt-4">
+        <a href="{% url 'app:month_with_schedule' year=current_day_date.year month=current_day_date.month %}" class="btn btn-secondary">月表示に戻る</a>
+    </div>
+
+</div>
+{% endblock %}
