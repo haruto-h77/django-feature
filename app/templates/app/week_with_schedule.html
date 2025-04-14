@@ -10,36 +10,32 @@
 
     <table class="table table-bordered">
         <thead>
-        <tr>
-            {% for w in week_names %}
-                <th>{{ w }}</th>
-            {% endfor %}
-        </tr>
+            <tr>
+                <th>曜日</th>
+                <th>日付</th>
+                <th>予定</th>
+            </tr>
         </thead>
         <tbody>
-        <tr>
-            {% for day in week_days %}
-                {% if now == day %}
-                    <td class="table-success">
-                {% else %}
-                    <td>
-                {% endif %}
-            <a href="{% url 'app:mycalendar' day.year day.month day.day %}">
-                {% if week_first.month != day.month %}
-                    {{ day | date:"m/d" }}
-                {% else %}
-                    {{ day.day }}
-                {% endif %}
-            </a>
-            </td>
-            {% endfor %}
-        </tr>
-        <tr>
-            {% for day in week_days %}
+            {% for w, day in week_data %}
+            <tr>
+                <!-- 曜日 -->
+                <th>{{ w }}</th>
+    
+                <!-- 日付リンク付き -->
+                <td {% if now == day %}class="table-success"{% endif %}>
+                    <a href="{% url 'app:mycalendar' day.year day.month day.day %}">
+                        {% if week_first.month != day.month %}
+                            {{ day | date:"m/d" }}
+                        {% else %}
+                            {{ day.day }}
+                        {% endif %}
+                    </a>
+                </td>
+    
+                <!-- スケジュール＆祝日 -->
                 <td>
-                    <!-- is_holiday フィルタで祝日か判定 -->
                     {% with is_holiday_today=week_holidays|is_holiday:day %}
-                        <!-- 祝日なら名前を表示 -->
                         {% if is_holiday_today %}
                             {% with holiday_name=week_holidays|get_item:day %}
                                 {% if holiday_name %}
@@ -48,19 +44,20 @@
                             {% endwith %}
                         {% endif %}
                     {% endwith %}
-                    <!-- 選択日のスケジュールを取得して表示 -->
+    
                     {% with day_schedules=week_day_schedules|get_item:day %}
                         {% if day_schedules %}
                             {% for s in day_schedules %}
                                 {{ s.start_time }} - {{ s.end_time }}<br>
                                 <a href="{% url 'app:day' s.date.year s.date.month s.date.day s.pk %}">{{ s.summary }}</a><br>
                                 {{ s.description | urlize | linebreaks }}
+                                {% if not forloop.last %}<hr>{% endif %}
                             {% endfor %}
                         {% endif %}
                     {% endwith %}
                 </td>
+            </tr>
             {% endfor %}
-        </tr>
         </tbody>
     </table>
 {% endblock %}

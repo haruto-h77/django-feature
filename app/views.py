@@ -66,6 +66,8 @@ class WeekWithScheduleCalendar(mixins.WeekWithScheduleMixin, generic.TemplateVie
         context = super().get_context_data(**kwargs)
         calendar_context = self.get_week_calendar()
         context.update(calendar_context)
+        week_data = zip(self.get_week_names(), self.get_week_days())
+        context["week_data"] = list(week_data)
         return context
 
 
