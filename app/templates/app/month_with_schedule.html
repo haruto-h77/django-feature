@@ -72,7 +72,7 @@
                                     {% endif %}
                                     <!-- スケジュール表示 -->
                                     {% for schedule in schedules %}
-                                        <p>{{ schedule.summary }}</p>
+                                        <p><a href="{% url 'app:day' schedule.date.year schedule.date.month schedule.date.day schedule.pk %}">{{ schedule.summary }}</a></p><br>
                                     {% endfor %}
                                 </div>
                             </a>

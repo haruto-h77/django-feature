@@ -53,7 +53,7 @@
                         {% if day_schedules %}
                             {% for s in day_schedules %}
                                 {{ s.start_time }} - {{ s.end_time }}<br>
-                                {{ s.summary }}<br>
+                                <a href="{% url 'app:day' s.date.year s.date.month s.date.day s.pk %}">{{ s.summary }}</a><br>
                                 {{ s.description | urlize | linebreaks }}
                             {% endfor %}
                         {% endif %}

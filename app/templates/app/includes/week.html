@@ -13,7 +13,7 @@
                     {% else %}
                 <td>
             {% endif %}
-            <a href="{% url 'app:mycalendar' day.year day.month day.day %}">
+        <a href="{% url 'app:mycalendar' day.year day.month day.day %}">
         {% if week_first.month != day.month %}
             {{ day | date:"m/d" }}
         {% else %}
@@ -42,7 +42,7 @@
                 {% with schedules=week_day_schedules|get_item:day %}
                     {% for s in schedules %}
                         {{ s.start_time|date:"H:i" }} - {{ s.end_time|date:"H:i" }}<br>
-                        {{ s.summary }}<br>
+                        <a href="{% url 'app:day' s.date.year s.date.month s.date.day s.pk %}">{{ s.summary }}</a><br>
                         {{ s.description | urlize | linebreaksbr }}
                     {% endfor %}
                 {% endwith %}

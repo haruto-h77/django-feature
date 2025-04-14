@@ -1,0 +1,25 @@
+<form method="post" action="{% url 'app:schedule_edit' schedule.pk %}">
+    {% csrf_token %}
+
+    <label>タイトル:</label><br>
+    <input type="text" name="summary" value="{{ schedule.summary }}"><br><br>
+
+    <label>内容:</label><br>
+    <textarea name="description" rows="3">{{ schedule.description }}</textarea><br><br>
+
+    <label>日付:</label><br>
+    <input type="date" name="date" value="{{ current_day_date|date:'Y-m-d' }}"><br><br>
+
+    <label>開始時間:</label><br>
+    <input type="time" name="start_time" value="{{ schedule.start_time|time:'H:i' }}"><br><br>
+
+    <label>終了時間:</label><br>
+    <input type="time" name="end_time" value="{{ schedule.end_time|time:'H:i' }}"><br><br>
+
+    <button type="submit">保存</button>
+</form>
+<!-- 削除フォーム（POST） -->
+<form method="post" action="{% url 'app:schedule_delete' schedule.pk %}" style="margin-top: 1em;">
+    {% csrf_token %}
+    <button type="submit" onclick="return confirm('本当に削除しますか？')">削除</button>
+</form>

@@ -25,4 +25,11 @@ urlpatterns = [
     path(
         'mycalendar/<int:year>/<int:month>/<int:day>/', views.MyCalendar.as_view(), name='mycalendar'
     ),
+
+    # 予定の詳細表示
+    path('day/<int:year>/<int:month>/<int:day>/<int:pk>/', views.DayCalendar.as_view(), name='day'),
+    # 予定の編集
+    path('schedule/edit/<int:pk>/', views.schedule_edit, name='schedule_edit'),
+    # 予定の削除
+    path('schedule/delete/<int:pk>/', views.schedule_delete, name='schedule_delete'),
 ]
