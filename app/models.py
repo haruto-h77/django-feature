@@ -14,7 +14,8 @@ class Schedule(models.Model):
     start_date = models.DateField('開始日', default=timezone.now)
     end_date = models.DateField('終了日', default=timezone.now)
     user_id = models.IntegerField('ユーザーID', default=1)
-    project_id = models.IntegerField('プロジェクトID', default=1)    
+    project_id = models.IntegerField('プロジェクトID', default=1)
+    reminder_task_id = models.CharField('タスクID',max_length=255, blank=True, null=True)
 
     def __str__(self):
         return self.summary
