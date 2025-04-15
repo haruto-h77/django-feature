@@ -41,12 +41,13 @@ class TodoForm(forms.ModelForm):
     class Meta:
         model = Todo
         # どのフィールドを使用するか
-        fields = ('item_name','user','expire_date','is_finished','finished_date')
+        fields = ('item_name','user','expire_date','expire_time','is_finished','finished_date')
         # フィールドに対するラベル
         labels = {
             'item_name': '項目名',
             'user': '担当者',
             'expire_date': '期限日',
+            'expire_time': '期限時刻',
         }
         # 基本的なバリデーション
         error_messages = {
@@ -59,10 +60,14 @@ class TodoForm(forms.ModelForm):
             "expire_date": {
                 "required": "期限日が入力されていません",
             },
+            "expire_time": {
+                "required": "期限時刻が入力されていません",
+            },
         }
         # ウィジェット
         widgets = {
-            'expire_date': forms.DateInput(attrs={"type":"date"})
+            'expire_date': forms.DateInput(attrs={"type":"date"}),
+            'expire_time': forms.TimeInput(attrs={"type" : "time"})
         }
     # 登録時および更新時、初期設定
     def __init__(self,*args, **kwargs):
