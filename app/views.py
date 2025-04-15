@@ -188,10 +188,8 @@ class DayCalendar(mixins.WeekWithScheduleMixin, generic.TemplateView):
         
         try:
             current_day_date = datetime.date(year, month, day)
-            # コンテキストに 'current_day_date' という名前で追加
             context['current_day_date'] = current_day_date
         except ValueError:
-            # URLの日付が無効な場合の処理 (通常はURLパターンで防がれる)
             context['current_day_date'] = None # または Http404 を発生させるなど
         return context
 
@@ -204,28 +202,27 @@ def schedule_edit(request, pk):
         if form.is_valid():
             schedule = form.save()
             return redirect(reverse('app:month_with_schedule', kwargs={
-                'year': schedule.date.year,
-                'month': schedule.date.month,
-            }))
+                'year': form.cleaned_data['date'].year,
+                'month': form.cleaned_data['date'].month,
+        }))
         else:
             print(form.errors)
-            context = {'form': form, 'schedule': schedule}
+            context = {'form': form, 'schedule': schedule, 'current_day_date': schedule.date}
             return render(request, 'app/day.html', context)
 
     else:
         form = ScheduleDetailForm(instance=schedule)
-        context = {'form': form, 'schedule': schedule}
+        context = {'form': form, 'schedule': schedule, 'current_day_date': schedule.date }
         return render(request, 'app/day.html', context)
 
 # 削除処理
 def schedule_delete(request, pk):
     schedule = get_object_or_404(Schedule, pk=pk)
     if request.method == 'POST':
-        date = schedule.date # 削除前に日付を保持
+        date = schedule.date
         schedule.delete()
         return redirect(reverse('app:month_with_schedule', kwargs={
             'year': date.year,
             'month': date.month,
         }))
-    # POST 以外のリクエストに対する処理(POST以外だとNoneを返してしまうため)
-    return redirect(reverse('app:month_with_schedule', kwargs={'year': schedule.date.year, 'month': schedule.date.month})) # 例: GETなら月表示へ
+    return redirect(reverse('app:month_with_schedule', kwargs={'year': schedule.date.year, 'month': schedule.date.month}))
