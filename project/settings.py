@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
+from django.urls import reverse_lazy
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -38,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'todo.apps.TodoConfig'
+    'todo',
 ]
 
 MIDDLEWARE = [
@@ -138,3 +139,7 @@ CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Redisを使用する
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'  # 結果をRedisに保存
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
+
+LOGIN_URL = reverse_lazy('Login')        # ログインが必要なページに未ログインでアクセスした時のリダイレクト先
+LOGIN_REDIRECT_URL = reverse_lazy('list') # ログイン成功後のリダイレクト先 (例: Todoリスト)
+LOGOUT_REDIRECT_URL = reverse_lazy('Login') # ★★★ ログアウト後のリダイレクト先 ★★★

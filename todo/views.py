@@ -75,7 +75,7 @@ class TodoCreateView(LoginRequiredMixin, CreateView):
     # ページの設定
     template_name = "todo/edit.html"
     # 新規登録成功時のURL
-    success_url = "/"
+    success_url = reverse_lazy('list')
     # 登録画面として表示する
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -86,7 +86,7 @@ class TodoCreateView(LoginRequiredMixin, CreateView):
         todo_form = form.save(commit=False)
         todo_form.registration_date = timezone.now() # 登録日を本日にセット
         todo_form.save() # 保存する
-        return redirect('/')
+        return redirect(reverse_lazy('list'))
 ###
 # 更新画面
 class TodoUpdateView(LoginRequiredMixin, UpdateView):
@@ -97,7 +97,7 @@ class TodoUpdateView(LoginRequiredMixin, UpdateView):
     # ページの設定
     template_name = "todo/edit.html"
     # 新規登録成功時のURL
-    success_url = "../"
+    success_url = reverse_lazy('list')
     # フォームで表示するときの完了チェック
     is_finished = True
     # 編集画面として表示する
@@ -121,7 +121,7 @@ class TodoDeleteView(LoginRequiredMixin, UpdateView):
     # フィールドの指定
     fields = ('is_deleted', )
     # 削除処理成功時のURL
-    success_url = "/"
+    success_url = reverse_lazy('list')
     # 削除対象であり、ログイン中のユーザーのIDのTodoを取得
     def get_object(self):
         return get_object_or_404(Todo, pk=self.request.POST["id"], user=self.request.user)
@@ -130,7 +130,7 @@ class TodoDeleteView(LoginRequiredMixin, UpdateView):
         todo_form = form.save(commit=False)
         todo_form.is_deleted = True # 削除処理
         todo_form.save() # 保存する
-        return redirect('/')
+        return redirect(reverse_lazy('list'))
 ###
 # 完了処理　*POSTのみ
 class TodoCompleteView(LoginRequiredMixin, UpdateView):
@@ -139,7 +139,7 @@ class TodoCompleteView(LoginRequiredMixin, UpdateView):
     # フィールドの指定
     fields = ('finished_date', )
     # 完了処理成功時のURL
-    success_url = "/"
+    success_url = reverse_lazy('list')
     # 完了対象であり、ログイン中のユーザーのIDのTodoを取得
     def get_object(self):
         return get_object_or_404(Todo, pk=self.request.POST["id"], user=self.request.user)
@@ -148,7 +148,7 @@ class TodoCompleteView(LoginRequiredMixin, UpdateView):
         todo_form = form.save(commit=False)
         todo_form.finished_date = timezone.now() # 削除処理
         todo_form.save() # 保存する
-        return redirect('/')
+        return redirect(reverse_lazy('list'))
 ###
 # 関数ビュー
 ###

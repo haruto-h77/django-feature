@@ -27,4 +27,11 @@ class Todo(models.Model):
 
     @property
     def expire(self):
-        return self.expire_date < timezone.now()
+        # オプション: 完了済みの場合は期限切れとしない
+        if self.finished_date:
+            return False
+        # expire_date が存在し (Noneでなく)、かつ現在時刻より前であれば True (期限切れ)
+        if self.expire_date and self.expire_date < timezone.now():
+            return True
+        # expire_date が None か、未来の日付の場合は False (期限切れではない)
+        return False

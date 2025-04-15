@@ -1,19 +1,37 @@
-.side{
-  display:inline-block;
+.side {
+  display: inline-block;
 }
 
-.finish>td{
+.finish > td {
   text-decoration: line-through;
 }
 
-.expire{
-  color: #dc3545!important;
+.expire {
+  color: #dc3545 !important;
 }
 
-@media (min-width: 576px){
+@media (min-width: 576px) {
   .search .form-control {
-      display: inline-block;
-      width: auto;
-      vertical-align: middle;
+    display: inline-block;
+    width: auto;
+    vertical-align: middle;
   }
+}
+
+.dropdown-menu .nav-link {
+  /* Bootstrap 5 のデフォルトのテキスト色 (黒に近い色) */
+  color: #212529 !important;
+  /* または、Bootstrap のデフォルトのリンク色 */
+  /* color: var(--bs-link-color) !important; */
+  /* または、単純に黒 */
+  /* color: black !important; */
+
+  /* btn-link スタイルによる下線を消す場合 (任意) */
+  text-decoration: none;
+}
+
+/* ホバー時の色も調整する場合 (任意) */
+.dropdown-menu .nav-link:hover {
+  color: #0a58ca !important; /* 例: Bootstrapのリンクホバー色 */
+  background-color: #e9ecef; /* 例: 背景色を少し変える */
 }
