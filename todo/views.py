@@ -21,7 +21,8 @@ from django.urls import reverse_lazy
 # モデル関連
 from django.contrib.auth.models import User
 from .models import Todo
-from django.db.models import Q
+from django.db.models import Q, ExpressionWrapper, BooleanField, F
+# timezone
 from django.utils import timezone
 
 ###
@@ -58,12 +59,23 @@ class TodoList(LoginRequiredMixin, ListView):
     # Todoの一覧をユーザー、検索文字でフィルタして取得する
     def get_queryset(self):
         search_param = self.request.GET.get('search') # 検索文字の取得
-        if search_param is None: # 検索文字がない場合
-            query_result = self.model.objects.filter(user=self.request.user) # ログインユーザーでフィルタ
-        else: # 検索文字がある場合
-            query_result = self.model.objects.filter( \
+        base_query = self.model.objects.filter(user=self.request.user) # ログインユーザーでフィルタ
+        
+        if search_param: # 検索文字がある場合
+            query_result = base_query.filter( \
                 Q(item_name__icontains=search_param) | Q(user__username__icontains=search_param), \
                 user=self.request.user)
+        else: # 検索文字がない場合
+            query_result = base_query
+        
+        query_result = query_result.annotate(
+            is_actually_finished=ExpressionWrapper(
+                Q(finished_date__isnull=False), # finished_date が NULL でなければ True
+                output_field=BooleanField()
+            )
+        )
+        
+        query_result = query_result.order_by('is_actually_finished', F('expire_date').asc(nulls_last=True), 'registration_date')
         return query_result # 結果を返す
 ###
 # 新規作成画面
