@@ -6,8 +6,6 @@ class Todo(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
     item_name = models.CharField(max_length=100)
     registration_date = models.DateTimeField(blank=True,null=True)
-    # expire_date = models.DateTimeField(blank=True,null=True)
-    # expire_time = models.TimeField(blank=True,null=True)
     finished_date = models.DateTimeField(blank=True,null=True)
     expire_datetime = models.DateTimeField(blank=True,null=True)
     is_deleted = models.BooleanField(default=False)
@@ -32,8 +30,8 @@ class Todo(models.Model):
         # オプション: 完了済みの場合は期限切れとしない
         if self.finished_date:
             return False
-        # expire_date が存在し (Noneでなく)、かつ現在時刻より前であれば True (期限切れ)
+        # expire_datetime が存在し (Noneでなく)、かつ現在時刻より前であれば True (期限切れ)
         if self.expire_datetime and self.expire_datetime < timezone.now():
             return True
-        # expire_date が None か、未来の日付の場合は False (期限切れではない)
+        # expire_datetime が None か、未来の日付の場合は False (期限切れではない)
         return False

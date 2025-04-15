@@ -49,8 +49,6 @@ class TodoForm(forms.ModelForm):
             'expire_datetime': '期限日時',
             'is_finished': '完了',
             'expire_datetime': '期限日時',
-            # 'expire_date': '期限日',
-            # 'expire_time': '期限時刻',
         }
         # 基本的なバリデーション
         error_messages = {
@@ -63,18 +61,10 @@ class TodoForm(forms.ModelForm):
             "expire_datetime": {
                 "required": "期限日時が入力されていません",
             },
-            # "expire_date": {
-            #     "required": "期限日が入力されていません",
-            # },
-            # "expire_time": {
-            #     "required": "期限時刻が入力されていません",
-            # },
         }
         # ウィジェット
         widgets = {
             'expire_datetime': forms.DateTimeInput(attrs={"type":"datetime-local"}),
-            # 'expire_date': forms.DateInput(attrs={"type":"date"}),
-            # 'expire_time': forms.TimeInput(attrs={"type" : "time"})
         }
     # 登録時および更新時、初期設定
     def __init__(self,*args, **kwargs):

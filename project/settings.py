@@ -81,7 +81,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'ViZaro',  # 使用するデータベース名
         'USER': 'postgres',  # データベースユーザー名
-        'PASSWORD': 'postgres',  # データベースパスワード
+        'PASSWORD': 'haruto0512',  # データベースパスワード
         'HOST': 'localhost',  # ホスト名（通常はlocalhost）
         'PORT': '5432',  # PostgreSQLのポート（デフォルトは5432）
     }

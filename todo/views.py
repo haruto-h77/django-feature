@@ -75,7 +75,7 @@ class TodoList(LoginRequiredMixin, ListView):
             )
         )
         
-        query_result = query_result.order_by('is_actually_finished', F('expire_date').asc(nulls_last=True), F('expire_time').asc(nulls_last=True),'registration_date')
+        query_result = query_result.order_by('is_actually_finished', F('expire_datetime').asc(nulls_last=True),'registration_date')
         return query_result # 結果を返す
 ###
 # 新規作成画面
