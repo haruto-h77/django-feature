@@ -8,6 +8,7 @@
           <th scope="col">担当者</th>
           <th scope="col">登録日</th>
           <th scope="col">期限日</th>
+          <th scope="col">期限時間</th>
           <th scope="col">完了日</th>
           <th scope="col">操作</th>
         </tr>
@@ -26,6 +27,7 @@
             <td class="align-middle">{{ todo.user }}</td>
             <td class="align-middle">{{ todo.registration_date | date:'Y/m/d' }}</td>
             <td class="align-middle">{{ todo.expire_date | date:'Y/m/d' }}</td>
+            <td class="align-middle">{{ todo.expire_time }}</td>
             <td class="align-middle">{{ todo.finished_date | date:'Y/m/d' }}</td>
             <td class="align-middle button actions">
               <form method="POST" class="side" action="{% url 'complete' %}">

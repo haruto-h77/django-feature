@@ -7,6 +7,7 @@ class Todo(models.Model):
     item_name = models.CharField(max_length=100)
     registration_date = models.DateTimeField(blank=True,null=True)
     expire_date = models.DateTimeField(blank=True,null=True)
+    expire_time = models.TimeField(blank=True,null=True)
     finished_date = models.DateTimeField(blank=True,null=True)
     is_deleted = models.BooleanField(default=False)
     create_date_time = models.DateTimeField(default=timezone.now)
