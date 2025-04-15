@@ -1,53 +1,123 @@
 {% load static %}
 <!DOCTYPE html>
 <html>
-<head>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <link rel="stylesheet" href="{% static 'css/todo.css' %}">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-  <title>Todoリスト</title>
-</head>
-<body>
-  <header class="bg-primary text-white navbar navbar-dark navbar-expand-md ">
-    <div class="container-fluid">
-      <h1 class="navbar-brand mb-0">TODOリスト</h1>
-      {% if not request.user.is_anonymous %}
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <nav class="navbar-collapse collapse" id="navbarNav">
-        <ul class="navbar-nav">
-          <li class="nav-item"><a class="nav-link {% if crud == '一覧' %} active {% endif %}" href="{% url 'list' %}">作業一覧</a></li>
-          <li class="nav-item"><a class="nav-link {% if crud == '登録' %} active {% endif %}" href="{% url 'new' %}">作業登録</a></li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-              {{ request.user }}さん
-            </a>
-            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <a class="dropdown-item" href="{% url 'Logout' %}">ログアウト</a>
-            </div>
-          </li>
-        </ul>
-        <form class="my-2 my-lg-0 ms-auto search" action="/" method="get">
-          <input class="col form-control me-sm-2" type="search" placeholder="Search" aria-label="Search" name="search" value="">
-          <button class="col btn btn-outline-light my-2 my-sm-0" type="submit">検索</button>
-        </form>
-      </nav>
-      {% else %}
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <nav class="navbar-collapse collapse" id="navbarNav">
-        <ul class="navbar-nav">
-          <li class="nav-item"><a class="nav-link {% if crud == '新規登録' %} active {% endif %}" href="{% url 'register' %}">ユーザー登録</a></li>
-        </ul>
-      </nav>
-      {% endif %}
-    </div>
-  </header>
-  {% block content %}
-  {% endblock %}
-</body>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="{% static 'css/todo.css' %}" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+      crossorigin="anonymous"
+    ></script>
+    <title>Todoリスト</title>
+  </head>
+  <body>
+    <header class="bg-primary text-white navbar navbar-dark navbar-expand-md">
+      <div class="container-fluid">
+        <h1 class="navbar-brand mb-0">TODOリスト</h1>
+        {% if not request.user.is_anonymous %}
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <nav class="navbar-collapse collapse" id="navbarNav">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a
+                class="nav-link {% if crud == '一覧' %} active {% endif %}"
+                href="{% url 'list' %}"
+                >作業一覧</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link {% if crud == '登録' %} active {% endif %}"
+                href="{% url 'new' %}"
+                >作業登録</a
+              >
+            </li>
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                id="navbarDropdown"
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                {{ request.user }}さん
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <form
+                  method="post"
+                  action="{% url 'Logout' %}"
+                  style="display: inline"
+                >
+                  {# 必要に応じてスタイル調整 #} {% csrf_token %}
+                  <button type="submit" class="btn btn-link nav-link">
+                    ログアウト
+                  </button>
+                </form>
+              </div>
+            </li>
+          </ul>
+          <form class="my-2 my-lg-0 ms-auto search" action="/" method="get">
+            <input
+              class="col form-control me-sm-2"
+              type="search"
+              placeholder="Search"
+              aria-label="Search"
+              name="search"
+              value=""
+            />
+            <button
+              class="col btn btn-outline-light my-2 my-sm-0"
+              type="submit"
+            >
+              検索
+            </button>
+          </form>
+        </nav>
+        {% else %}
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <nav class="navbar-collapse collapse" id="navbarNav">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a
+                class="nav-link {% if crud == '新規登録' %} active {% endif %}"
+                href="{% url 'register' %}"
+                >ユーザー登録</a
+              >
+            </li>
+          </ul>
+        </nav>
+        {% endif %}
+      </div>
+    </header>
+    {% block content %} {% endblock %}
+  </body>
 </html>
