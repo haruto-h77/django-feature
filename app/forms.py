@@ -92,16 +92,18 @@ class SimpleScheduleForm(forms.ModelForm):
 
 class ScheduleDetailForm(forms.ModelForm):
     """スケジュール詳細画面用のフォーム"""
+
     class Meta:
         model = Schedule
         # DBで使うテーブル名を指定
         fields = ('summary', 'description', 'start_time', 'end_time', 'date')
         # 入力ウィジェットのカスタム
         widgets = {
-            'start_time': forms.TimeInput(attrs={'type': 'time'}),
-            'end_time': forms.TimeInput(attrs={'type': 'time'}),
-            'date': forms.DateInput(attrs={'type': 'date'}),
-            'description': forms.Textarea(attrs={'rows': 3}),
+            'start_time': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
+            'end_time': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
+            'date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
+            'summary': forms.TextInput(attrs={'class': 'form-control'}),
         }
         # 必要に応じてラベルも変更可能
         labels = {
@@ -111,15 +113,29 @@ class ScheduleDetailForm(forms.ModelForm):
             'end_time': '終了時刻',
             'date': '日付',
         }
-        
-    # # 必要であれば clean_end_time のようなバリデーションも追加
-    # def clean_end_time(self):
-    #     start_time = self.cleaned_data.get('start_time')
-    #     end_time = self.cleaned_data.get('end_time')
-    #     # start_time や end_time が取得できない場合も考慮
-    #     if start_time and end_time and end_time <= start_time:
-    #         raise forms.ValidationError(
-    #             '終了時間は、開始時間よりも後にしてください'
-    #         )
-    #     return end_time
-    
+
+    def clean(self):
+        cleaned_data = super().clean()
+        summary = cleaned_data.get('summary')
+        description = cleaned_data.get('description')
+        date = cleaned_data.get('date')
+        start_time = cleaned_data.get('start_time')
+        end_time = cleaned_data.get('end_time')
+
+        # summaryの文字数チェック
+        if summary and len(summary) > 50:
+            self.add_error('summary', '1文字以上、50文字以内で入力してください')
+
+        # descriptionの文字数チェック
+        if description and len(description) > 200:
+            self.add_error('description', '200文字以内で入力してください')
+
+        # 時刻と日付の入力チェック
+        if None in (date, start_time, end_time):
+            raise forms.ValidationError('日付・開始時刻・終了時刻をすべて入力してください。')
+
+        # 時間の整合性チェック（同日内）
+        if start_time and end_time and end_time <= start_time:
+            self.add_error('end_time', '終了時間が開始時間よりも前に設定されています')
+
+        return cleaned_data
