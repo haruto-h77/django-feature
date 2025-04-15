@@ -27,7 +27,7 @@
             <td class="align-middle">{{ todo.registration_date | date:'Y/m/d' }}</td>
             <td class="align-middle">{{ todo.expire_date | date:'Y/m/d' }}</td>
             <td class="align-middle">{{ todo.finished_date | date:'Y/m/d' }}</td>
-            <td class="align-middle button">
+            <td class="align-middle button actions">
               <form method="POST" class="side" action="{% url 'complete' %}">
                 {% csrf_token %}
                 <input type="hidden" name="id" value='{{todo.pk}}'>
