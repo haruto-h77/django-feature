@@ -75,14 +75,18 @@
               </div>
             </li>
           </ul>
-          <form class="my-2 my-lg-0 ms-auto search" action="/" method="get">
+          <form
+            class="my-2 my-lg-0 ms-auto search"
+            action="{% url 'list' %}"
+            method="get"
+          >
             <input
               class="col form-control me-sm-2"
               type="search"
               placeholder="Search"
               aria-label="Search"
               name="search"
-              value=""
+              value="{{ request.GET.search }}"
             />
             <button
               class="col btn btn-outline-light my-2 my-sm-0"

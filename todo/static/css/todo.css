@@ -2,8 +2,14 @@
   display: inline-block;
 }
 
-.finish > td {
+/* static/css/todo.css (HTMLでクラスを追加した場合) */
+tr.finish td {
   text-decoration: line-through;
+  color: gray;
+}
+tr.finish td.actions {
+  /* actions クラスを持つ td を指定 */
+  text-decoration: none;
 }
 
 .expire {
