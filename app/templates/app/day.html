@@ -1,10 +1,9 @@
-{% extends 'app/base.html' %} 
+{% extends 'app/base.html' %}
 
 {% block content %}
 <div class="container mt-4">
     <h2>スケジュール編集</h2>
-
-    <form method="post" action="{% url 'app:schedule_edit' schedule.pk %}">
+    <form id="edit-form" method="post" action="{% url 'app:schedule_edit' schedule.pk %}">
         {% csrf_token %}
 
         <div class="mb-3">
@@ -34,21 +33,17 @@
                 <input type="time" name="end_time" value="{{ schedule.end_time|time:'H:i' }}" class="form-control" id="id_end_time" required>
             </div>
         </div>
-
-        <div class="d-flex justify-content-between align-items-center">
-            <button type="submit" class="btn btn-primary">保存</button>
-
-            <form method="post" action="{% url 'app:schedule_delete' schedule.pk %}" class="d-inline" onsubmit="return confirm('本当に削除しますか？')">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-danger">削除</button>
-            </form>
-        </div>
-
     </form>
 
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <button type="submit" form="edit-form" class="btn btn-primary">保存</button>
+        <form method="post" action="{% url 'app:schedule_delete' schedule.pk %}" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">削除</button>
+        </form>
+    </div>
     <div class="mt-4">
         <a href="{% url 'app:month_with_schedule' year=current_day_date.year month=current_day_date.month %}" class="btn btn-secondary">月表示に戻る</a>
     </div>
-
 </div>
 {% endblock %}
