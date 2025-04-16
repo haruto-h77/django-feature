@@ -2,7 +2,7 @@
 
 {% block extra_head %}
 <style>
-  tr[data-bs-toggle="collapse"] {
+  td[data-bs-toggle="collapse"] {
     cursor: pointer; /* カーソルを指に変更 */
   }
 </style>
@@ -63,16 +63,27 @@
 
           <tr
             {% if todo.finished_date %}class="finish"{% elif todo.expire %}class="expire"{% endif %}
-            data-bs-toggle="collapse"
+          >
+            <td class="align-middle" data-bs-toggle="collapse"
             data-bs-target="#collapse-description-{{ todo.pk }}"
             aria-expanded="false"
-            aria-controls="collapse-description-{{ todo.pk }}"
-          >
-            <td class="align-middle">{{ todo.item_name }}</td>
-            <td class="align-middle">{{ todo.user }}</td>
-            <td class="align-middle">{{ todo.registration_date | date:'Y/m/d' }}</td>
-            <td class="align-middle">{{ todo.expire_datetime | date:'Y/m/d H:i'}}</td>
-            <td class="align-middle">{{ todo.finished_date | date:'Y/m/d' }}</td>
+            aria-controls="collapse-description-{{ todo.pk }}">{{ todo.item_name }}</td>
+            <td class="align-middle"  data-bs-toggle="collapse"
+            data-bs-target="#collapse-description-{{ todo.pk }}"
+            aria-expanded="false"
+            aria-controls="collapse-description-{{ todo.pk }}">{{ todo.user }}</td>
+            <td class="align-middle"  data-bs-toggle="collapse"
+            data-bs-target="#collapse-description-{{ todo.pk }}"
+            aria-expanded="false"
+            aria-controls="collapse-description-{{ todo.pk }}">{{ todo.registration_date | date:'Y/m/d' }}</td>
+            <td class="align-middle" data-bs-toggle="collapse"
+            data-bs-target="#collapse-description-{{ todo.pk }}"
+            aria-expanded="false"
+            aria-controls="collapse-description-{{ todo.pk }}">{{ todo.expire_datetime | date:'Y/m/d H:i'}}</td>
+            <td class="align-middle" data-bs-toggle="collapse"
+            data-bs-target="#collapse-description-{{ todo.pk }}"
+            aria-expanded="false"
+            aria-controls="collapse-description-{{ todo.pk }}">{{ todo.finished_date | date:'Y/m/d' }}</td>
             <td class="align-middle button actions">
               <form method="POST" class="side" action="{% url 'complete' %}" onclick="event.stopPropagation();">
                 {% csrf_token %}
@@ -80,7 +91,7 @@
                 <button class="btn btn-primary">完了</button>
               </form>
               <button type="button" class="btn btn-success side" onclick="event.stopPropagation(); location.href='{% url "edit" pk=todo.pk %}'">編集</button>
-              <form method="POST" class="side" action="{% url 'delete' %}">
+              <form method="POST" class="side" action="{% url 'delete' %}" onclick="event.stopPropagation();">
                 {% csrf_token %}
                 <input type="hidden" name="id" value='{{todo.pk}}'>
                 <button class="btn btn-danger">削除</button>
@@ -92,7 +103,7 @@
             <td colspan="6" class="p-0">
               <div class="collapse" id="collapse-description-{{ todo.pk }}">
                 <div class="card card-body m-2"> 
-                  <p class="mb-0">{{ todo.description | linebreaksbr }}</p> 
+                  <p class="mb-0">{{ todo.description | linebreaksbr | urlize}}</p> 
                 </div>
               </div>
             </td>
