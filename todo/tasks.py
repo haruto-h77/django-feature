@@ -22,9 +22,10 @@ def send_todo_reminder(todo_id):
 
         # 期限日時が存在する場合のみリマインダーを送信
         if todo.expire_datetime:
+            # expire_datetime を settings.TIME_ZONE のローカルタイムに変換
+            local_expire_datetime = timezone.localtime(todo.expire_datetime)
             # 期限日時を分かりやすい形式に変換
-            expire_str = todo.expire_datetime.strftime("%Y年%m月%d日 %H時%M分")
-
+            expire_str = local_expire_datetime.strftime("%Y年%m月%d日 %H時%M分")
             # メール本文を作成
             message = (
                 f"Todo項目: {todo.item_name}\n"
