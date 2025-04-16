@@ -11,6 +11,7 @@ class Todo(models.Model):
     is_deleted = models.BooleanField(default=False)
     create_date_time = models.DateTimeField(default=timezone.now)
     update_date_time = models.DateTimeField(default=timezone.now)
+    reminder_todo_task_id = models.CharField('todoタスクID',max_length=255, blank=True, null=True)
 
     def publish(self):
         self.save()
