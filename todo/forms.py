@@ -41,10 +41,11 @@ class TodoForm(forms.ModelForm):
     class Meta:
         model = Todo
         # どのフィールドを使用するか
-        fields = ('item_name','user','expire_datetime','is_finished','finished_date')
+        fields = ('item_name','description','user','expire_datetime','is_finished','finished_date')
         # フィールドに対するラベル
         labels = {
             'item_name': '項目名',
+            'description': '概要',
             'user': '担当者',
             'expire_datetime': '期限日時',
             'is_finished': '完了',
