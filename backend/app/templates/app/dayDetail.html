@@ -1,0 +1,58 @@
+{% extends 'app/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>スケジュール詳細</h2>
+    
+    <form id="edit-form" method="post" action="{% url 'app:schedule_edit' schedule.pk %}">
+        {% csrf_token %}
+
+        <div>タイトル:</div>
+        <div class="card mb-3">
+            <div class="card-body">
+                {{ schedule.summary }}
+            </div>
+        </div>
+
+        <div>内容:</div>
+        <div class="card mb-3">
+            <div class="card-body">
+                {{ schedule.description|urlize|linebreaksbr|safe }}
+            </div>
+        </div>
+
+        <div>日付:</div>
+        <div class="card mb-3">
+            <div class="card-body">
+                {{ current_day_date|date:'Y-m-d' }}
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="mb-1">開始時間:</div>
+                <div class="card">
+                    <div class="card-body">
+                        {{ schedule.start_time|time:'H:i' }}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-1">終了時間:</div>
+                <div class="card">
+                    <div class="card-body">
+                        {{ schedule.end_time|time:'H:i' }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        
+    </form>
+
+    <div class="mt-4">
+        <p><a href="{% url 'app:day' schedule.date.year schedule.date.month schedule.date.day schedule.pk %}" class="btn btn-primary">編集</a></p><br>
+        <a href="{% url 'app:month_with_schedule' year=current_day_date.year month=current_day_date.month %}" class="btn btn-secondary">月表示に戻る</a>
+    </div>
+</div>
+{% endblock %}
