@@ -4,7 +4,7 @@ from django.utils.timezone import make_aware, now
 from datetime import datetime, timedelta
 
 from .models import Schedule
-from .tasks import send_reminder
+from backend.app.tasks import send_reminder
 from celery import current_app
 
 def save_task_id(instance, task_id):

@@ -6,7 +6,7 @@ from datetime import timedelta
 
 # TodoモデルとTodo用タスクをインポート
 from .models import Todo
-from .tasks import send_todo_reminder # 作成したTodo用タスクをインポート
+from backend.todo.tasks import send_todo_reminder # 作成したTodo用タスクをインポート
 from celery import current_app
 import logging
 
