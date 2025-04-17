@@ -17,6 +17,20 @@
             float: right;
         }
 
+        #Registration-plus-btn {
+            font-size: 2.5rem;
+            color: #6c6c6c;
+            text-decoration: none;
+            display: inline-block;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000; /* 他の要素の上に出す */
+        }
+        #Registration-plus-btn:hover {
+            color: #242424;
+        }
+
     </style>
     <a href="{% url 'app:week_with_schedule' month_current.year month_current.month now.day %}">週表示に切り替え</a>
     <div>
@@ -84,5 +98,5 @@
         </tbody>
         
     </table>
-
+    <a href="{% url 'app:mycalendar' now.year now.month now.day %}" class="fab" id="Registration-plus-btn">⊕</a>
 {% endblock %}
