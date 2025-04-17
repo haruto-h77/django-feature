@@ -32,18 +32,20 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'app.apps.AppConfig',  # カレンダーアプリ
-    'todo',
-    'linker',
+    'backend.app.apps.AppConfig',  # カレンダーアプリ
+    'backend.todo',
+    'backend.linker',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware', # 1番上に設定するらしい
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -53,7 +55,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'project.urls'
+ROOT_URLCONF = 'backend.project.urls'
 
 TEMPLATES = [
     {
@@ -71,7 +73,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'project.wsgi.application'
+WSGI_APPLICATION = 'backend.project.wsgi.application'
 
 
 # Database
@@ -144,3 +146,17 @@ CELERY_TASK_SERIALIZER = 'json'
 LOGIN_URL = reverse_lazy('Login')        # ログインが必要なページに未ログインでアクセスした時のリダイレクト先
 LOGIN_REDIRECT_URL = reverse_lazy('list') # ログイン成功後のリダイレクト先 (例: Todoリスト)
 LOGOUT_REDIRECT_URL = reverse_lazy('Login') # ★★★ ログアウト後のリダイレクト先 ★★★
+
+# Reactのビルドファイルを静的ファイルとして認識
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'frontend', 'build', 'static'),
+]
+
+TEMPLATES[0]['DIRS'] = [
+    os.path.join(BASE_DIR, 'frontend', 'build')
+]
+
+# React側でAPIを叩く際に必要
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  # React開発サーバーのURL
+]
