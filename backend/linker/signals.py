@@ -5,6 +5,7 @@ from backend.todo.models import Todo
 from .models import ScheduleTodoLink
 from datetime import datetime
 from django.utils import timezone
+from pytz import timezone as pytz_timezone
 
 # 無限ループ対応
 __sync_flag = {"from_schedule": False, "from_todo": False}
@@ -72,21 +73,24 @@ def sync_from_todo(sender, instance, created, **kwargs):
     __sync_flag["from_todo"] = True
     try:
         link = ScheduleTodoLink.objects.filter(todo=instance).first()
+        # 日本時刻に設定
+        jst = pytz_timezone('Asia/Tokyo')
+        dt = instance.expire_datetime.astimezone(jst)
         if link:
             schedule = link.schedule
             schedule.summary = instance.item_name
             schedule.description = instance.description
             if instance.expire_datetime:
-                schedule.date = instance.expire_datetime.date()
-                schedule.end_time = instance.expire_datetime.time()
+                schedule.date = dt.date()
+                schedule.end_time = dt.time()
             schedule.save()
         else:
             if instance.expire_datetime:
                 schedule = Schedule.objects.create(
                     summary=instance.item_name,
                     description=instance.description,
-                    date=instance.expire_datetime.date(),
-                    end_time=instance.expire_datetime.time(),
+                    date=dt.date(),
+                    end_time=dt.time(),
                     user_id=instance.user.id,
                 )
             else:
