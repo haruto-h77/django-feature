@@ -107,12 +107,3 @@ ENV/
 db.sqlite3
 
 .vscode/
-
-.vscode/*
-node_modules
-dist-ssr
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
