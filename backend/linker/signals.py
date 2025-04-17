@@ -1,7 +1,7 @@
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
-from app.models import Schedule
-from todo.models import Todo
+from backend.app.models import Schedule
+from backend.todo.models import Todo
 from .models import ScheduleTodoLink
 from datetime import datetime
 from django.utils import timezone

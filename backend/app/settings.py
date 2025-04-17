@@ -1,14 +1,13 @@
 # settings.py
 
 INSTALLED_APPS = [
-    'app.apps.AppConfig',  # ← 自作したカレンダーアプリ（appディレクトリの中にある）
+    'backend.app.apps.AppConfig',  # ← 自作したカレンダーアプリ（appディレクトリの中にある）
     'django.contrib.admin',         # Djangoの管理画面
     'django.contrib.auth',          # 認証（ログイン・ユーザー管理）
     'django.contrib.contenttypes',  # モデル間の関連情報管理
     'django.contrib.sessions',      # セッション管理
     'django.contrib.messages',      # メッセージフレームワーク
     'django.contrib.staticfiles',   # CSSや画像などの静的ファイルの取り扱い
-    'app',
 ]
 
 
