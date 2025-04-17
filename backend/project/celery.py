@@ -4,7 +4,7 @@ import os
 from celery import Celery
 
 # Djangoのsettingsモジュールを設定
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'project.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.project.settings')
 
 # Celeryアプリケーションのインスタンスを作成
 app = Celery('project')
