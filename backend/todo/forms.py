@@ -8,6 +8,8 @@ from django.contrib.auth.forms import AuthenticationForm
 # モデル
 from django.contrib.auth.models import User
 from .models import Todo
+from backend.app.models import Schedule
+from backend.linker.models import ScheduleTodoLink
 # timezone
 from django.utils import timezone
 
@@ -98,10 +100,23 @@ class TodoForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         is_finished = cleaned_data.get('is_finished')
+        # Todoインスタンスに関連するScheduleを中間テーブル経由で取得
+        linked_schedules = ScheduleTodoLink.objects.filter(todo=self.instance)
+
         if is_finished:
             cleaned_data['finished_date'] = timezone.now()
+            # 関連するScheduleの完了フラグをTrueにする
+            for link in linked_schedules:
+                schedule = link.schedule
+                schedule.is_completed = True
+                schedule.save()
         else:
             cleaned_data['finished_date'] = None
+            for link in linked_schedules:
+                schedule = link.schedule
+                schedule.is_completed = False
+                schedule.save()
+
         return cleaned_data
 
 ###
