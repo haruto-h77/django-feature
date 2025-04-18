@@ -15,7 +15,7 @@ class Schedule(models.Model):
     project_id = models.IntegerField('プロジェクトID', default=1)
     reminder_task_id = models.CharField('タスクID',max_length=255, blank=True, null=True)
     is_completed = models.BooleanField(default=False)
-
+    reminder_enabled = models.BooleanField('リマインダー有効', default=True)
 
     def __str__(self):
         return self.summary

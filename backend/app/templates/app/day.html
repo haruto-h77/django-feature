@@ -1,35 +1,69 @@
-{% extends 'app/base.html' %}
-
-{% block content %}
+{% extends 'app/base.html' %} {% block content %}
 <div class="container mt-4">
-    <h2>スケジュール編集</h2>
-    <form id="edit-form" method="post" action="{% url 'app:schedule_edit' schedule.pk %}">
-        {% csrf_token %}
-
+  <h2>スケジュール編集</h2>
+  <form
+    id="edit-form"
+    method="post"
+    action="{% url 'app:schedule_edit' schedule.pk %}"
+  >
+    {% csrf_token %}
     {% if form.errors %}
     <div class="alert alert-danger">
-        <ul class="mb-0">
-            {% for field in form %}
-                {% for error in field.errors %}
-                    <li>{{ field.label }}: {{ error }}</li>
-                {% endfor %}
-            {% endfor %}
-            {% for error in form.non_field_errors %}
-                <li>{{ error }}</li>
-            {% endfor %}
-        </ul>
+      <ul class="mb-0">
+        {% for field in form %} 
+        {% for error in field.errors %}
+        <li>{{ field.label }}: {{ error }}</li>
+        {% endfor %} 
+        {% endfor %} 
+        {% for error in form.non_field_errors %}
+        <li>{{ error }}</li>
+        {% endfor %}
+      </ul>
     </div>
     {% endif %}
 
-        <div class="mb-3">
-            <label for="id_summary" class="form-label">タイトル:</label>
-            <input type="text" name="summary" value="{{ schedule.summary }}" class="form-control" id="id_summary" required>
-        </div>
+    <div class="mb-3">
+      <label for="id_summary" class="form-label">タイトル:</label>
+      <input
+        type="text"
+        name="summary"
+        value="{{ schedule.summary }}"
+        class="form-control"
+        id="id_summary"
+        required
+      />
+    </div>
 
-        <div class="mb-3">
-            <label for="id_description" class="form-label">内容:</label>
-            <textarea name="description" rows="3" class="form-control" id="id_description">{{ schedule.description }}</textarea>
-        </div>
+    <div class="mb-3">
+      <label for="id_description" class="form-label">内容:</label>
+      <textarea
+        name="description"
+        rows="3"
+        class="form-control"
+        id="id_description"
+      >
+{{ schedule.description }}</textarea
+      >
+    </div>
+
+    <div class="mb-3 form-check">
+      <input type="checkbox"
+             name="{{ form.reminder_enabled.name }}"
+             id="{{ form.reminder_enabled.id_for_label }}"
+             class="form-check-input{% if form.reminder_enabled.errors %} is-invalid{% endif %}"
+             {% if form.instance.reminder_enabled or form.reminder_enabled.value %}checked{% endif %}>
+      <label class="form-check-label" for="{{ form.reminder_enabled.id_for_label }}">
+        {{ form.reminder_enabled.label }}
+      </label>
+      {% if form.reminder_enabled.help_text %}
+      <small class="form-text text-muted d-block">
+        {{ form.reminder_enabled.help_text }}
+      </small>
+      {% endif %}
+      {% for error in form.reminder_enabled.errors %}
+      <div class="invalid-feedback d-block">{{ error }}</div>
+      {% endfor %}
+    </div>
 
         <div class="row mb-3">
             <div class="col-md-6">
@@ -43,15 +77,23 @@
         </div>
     </form>
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <button type="submit" form="edit-form" class="btn btn-primary">保存</button>
-        <form method="post" action="{% url 'app:schedule_delete' schedule.pk %}" class="d-inline">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-danger">削除</button>
-        </form>
-    </div>
-    <div class="mt-4">
-        <a href="{% url 'app:month_with_schedule' year=current_day_date.year month=current_day_date.month %}" class="btn btn-secondary">月表示に戻る</a>
-    </div>
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <button type="submit" form="edit-form" class="btn btn-primary">保存</button>
+    <form
+      method="post"
+      action="{% url 'app:schedule_delete' schedule.pk %}"
+      class="d-inline"
+    >
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">削除</button>
+    </form>
+  </div>
+  <div class="mt-4">
+    <a
+      href="{% url 'app:month_with_schedule' year=current_day_date.year month=current_day_date.month %}"
+      class="btn btn-secondary"
+      >月表示に戻る</a
+    >
+  </div>
 </div>
 {% endblock %}

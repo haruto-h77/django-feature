@@ -7,7 +7,7 @@ class BS4ScheduleForm(forms.ModelForm):
 
     class Meta:
         model = Schedule
-        fields = ('summary', 'description', 'start_datetime', 'end_datetime')
+        fields = ('summary', 'description', 'start_datetime', 'end_datetime','reminder_enabled')
 
         widgets = {
             'summary': forms.TextInput(attrs={
@@ -87,13 +87,14 @@ class ScheduleDetailForm(forms.ModelForm):
     class Meta:
         model = Schedule
         # DBで使うテーブル名を指定
-        fields = ('summary', 'description', 'start_datetime', 'end_datetime')
+        fields = ('summary', 'description', 'start_datetime', 'end_datetime','reminder_enabled')
         # 入力ウィジェットのカスタム
         widgets = {
             'start_datetime': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
             'end_datetime': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
             'description': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
             'summary': forms.TextInput(attrs={'class': 'form-control'}),
+            'reminder_enabled': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
         # 必要に応じてラベルも変更可能
         labels = {
@@ -101,7 +102,10 @@ class ScheduleDetailForm(forms.ModelForm):
             'description': '詳細',
             'start_datetime': '開始日時',
             'end_datetime': '終了日時',
+            'reminder_enabled': 'リマインダーを有効にする',
         }
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def clean(self):
         cleaned_data = super().clean()
@@ -125,5 +129,5 @@ class ScheduleDetailForm(forms.ModelForm):
         # 時間の整合性チェック（同日内）
         if start_datetime and end_datetime and end_datetime <= start_datetime:
             self.add_error('end_time', '終了時間が開始時間よりも前に設定されています')
-
+            
         return cleaned_data

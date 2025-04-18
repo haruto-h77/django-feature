@@ -126,6 +126,7 @@ class MyCalendar(mixins.MonthCalendarMixin, mixins.WeekWithScheduleMixin, generi
         summary = form.cleaned_data['summary']
         description = form.cleaned_data['description']
         date = form.cleaned_data['start_datetime'].date()
+        reminder_enabled = form.cleaned_data.get('reminder_enabled', True)
 
         schedule = Schedule(
             summary=summary,
@@ -133,6 +134,7 @@ class MyCalendar(mixins.MonthCalendarMixin, mixins.WeekWithScheduleMixin, generi
             date=date,
             start_datetime= start_datetime,
             end_datetime = end_datetime,
+            reminder_enabled=reminder_enabled,
         )
         schedule.save()
 
@@ -199,6 +201,9 @@ class DayCalendar(mixins.WeekWithScheduleMixin, generic.TemplateView):
             context['current_day_date'] = current_day_date
         except ValueError:
             context['current_day_date'] = None # または Http404 を発生させるなど
+        
+        context['form'] = ScheduleDetailForm(instance=schedule)
+        
         return context
 
 # 編集処理

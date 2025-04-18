@@ -161,23 +161,26 @@ class TodoCompleteView(LoginRequiredMixin, UpdateView):
     
     # 完了日フィールドを更新する
     def form_valid(self, form):
-        todo_form = form.save(commit=False)
-        todo_form.finished_date = timezone.now() # 削除処理
-        todo_form.save() # 保存する
+        todo = self.object
+        if todo is None: # get_object で None が返された場合
+             return redirect(self.success_url)
 
-        # finished_dateの有無で完了フラグを切り替え
-        is_complete = todo_form.finished_date is not None
-        
-        # Todoインスタンスに関連するScheduleを中間テーブル経由で取得
-        linked_schedules = ScheduleTodoLink.objects.filter(todo=todo_form)
+        # --- ★★★ ここで既に完了済みかチェック ★★★ ---
+        if todo.finished_date is not None:
+            # 既に完了済みなら何もせずリダイレクト
+            return redirect(self.success_url)
 
-        # 関連するScheduleの完了フラグをTrueにする
-        for link in linked_schedules:
-            schedule = link.schedule
-            schedule.is_completed = is_complete
-            schedule.save()
+        # --- 完了処理 ---
+        # 完了日時を設定
+        todo.finished_date = timezone.now()
+        # update_date_time はモデルで自動更新される想定
+        todo.save(update_fields=['finished_date', 'update_date_time']) # 更新フィールドを明示
 
-        return redirect(reverse_lazy('list'))
+        # 関連するリマインダータスクがあればキャンセル (シグナルでも行われるはず)
+        # from .signals import cancel_task_by_id # 必要ならインポート
+        # cancel_task_by_id(todo.reminder_todo_task_id, todo.id)
+
+        return redirect(self.success_url)
 ###
 # 関数ビュー
 ###

@@ -12,6 +12,14 @@ def send_reminder(schedule_id):
     try:
         schedule = Schedule.objects.get(id=schedule_id)
         
+        if not schedule.reminder_enabled:
+            logger.info(f"Reminder is disabled for Schedule {schedule_id}. Reminder not sent.")
+            return # リマインダー無効なら終了
+        
+        if schedule.is_completed:
+            logger.info(f"Schedule {schedule_id} is already completed. Reminder not sent.")
+            return # 完了済みの場合はメールを送らずに終了
+        
         # 時間をh時m分形式に変換
         start_time = schedule.start_time.strftime("%-H時%M分")  # %-H, %-Mでゼロ埋めを省略
         end_time = schedule.end_time.strftime("%-H時%M分")
