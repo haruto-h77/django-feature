@@ -76,10 +76,16 @@ def sync_from_todo(sender, instance, created, **kwargs):
         # 日本時刻に設定
         jst = pytz_timezone('Asia/Tokyo')
         dt = instance.expire_datetime.astimezone(jst)
+        # 完了時刻に値が設定されているか
+        if instance.finished_date:
+            complete_flug = True
+        else:
+            complete_flug = False
         if link:
             schedule = link.schedule
             schedule.summary = instance.item_name
             schedule.description = instance.description
+            schedule.is_completed = complete_flug
             if instance.expire_datetime:
                 schedule.date = dt.date()
                 schedule.end_time = dt.time()
@@ -92,6 +98,7 @@ def sync_from_todo(sender, instance, created, **kwargs):
                     date=dt.date(),
                     end_time=dt.time(),
                     user_id=instance.user.id,
+                    is_completed = complete_flug
                 )
             else:
                 schedule = Schedule.objects.create(
@@ -100,6 +107,7 @@ def sync_from_todo(sender, instance, created, **kwargs):
                     date=timezone.now().date(),
                     end_time=datetime.time(7, 0, 0),
                     user_id=instance.user.id,
+                    is_completed = complete_flug
                 )
             ScheduleTodoLink.objects.create(schedule=schedule, todo=instance)
     finally:

@@ -12,43 +12,59 @@ import calendar
 # 一覧 + 新規作成
 class ScheduleListCreateAPIView(APIView):
     def get(self, request):
+        # 全てのスケジュールを取得
         schedules = Schedule.objects.all()
+        # 複数のスケジュールを1つ1つJSON形式に変更（many=true）
         serializer = ScheduleSerializer(schedules, many=True)
         return Response(serializer.data)
 
     def post(self, request):
+        # 入力データから新しいスケジュールを作る準備
         serializer = ScheduleSerializer(data=request.data)
+        # バリデーション確認
         if serializer.is_valid():
+            # データベースに保存
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # 詳細取得 + 更新 + 削除
 class ScheduleDetailAPIView(APIView):
+    # 指定された主キーに一致するScheduleを取得するヘルパー関数
     def get_object(self, pk):
         return get_object_or_404(Schedule, pk=pk)
 
+    # 詳細取得
     def get(self, request, pk):
+        # 指定された主キーに一致するスケジュールを取得
         schedule = self.get_object(pk)
+        # JSON形式に変換
         serializer = ScheduleSerializer(schedule)
         return Response(serializer.data)
 
+    # 更新
     def put(self, request, pk):
+        # 指定された主キーに一致するスケジュールを取得
         schedule = self.get_object(pk)
+        # JSON形式に変換して更新する
         serializer = ScheduleSerializer(schedule, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    # 削除
     def delete(self, request, pk):
+        # 指定された主キーに一致するスケジュールを取得
         schedule = self.get_object(pk)
+        # データベースから削除
         schedule.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 # 月毎のカレンダーを取得する
 class MonthlyCalendarAPI(APIView):
     def get(self, request):
+        # クエリパラメータから年と月を取得
         year = int(request.GET.get('year'))
         month = int(request.GET.get('month'))
 
@@ -89,6 +105,7 @@ class MonthlyCalendarAPI(APIView):
 # 週ごとのカレンダーを取得する
 class WeeklyCalendarAPI(APIView):
     def get(self, request):
+        # クエリパラメータから日付を取得
         year = int(request.GET.get('year'))
         month = int(request.GET.get('month'))
         day = int(request.GET.get('day'))
@@ -97,11 +114,13 @@ class WeeklyCalendarAPI(APIView):
         start_of_week = target_date - timedelta(days=target_date.weekday())  # 月曜始まり
         week = []
 
+        # 7日分のスケジュールを取得
         for i in range(7):
             current_day = start_of_week + timedelta(days=i)
             schedules = Schedule.objects.filter(date=current_day)
             serialized_schedules = ScheduleSerializer(schedules, many=True).data
 
+            # カレンダー構造を生成
             week.append({
                 'date': current_day.isoformat(),
                 'schedules': serialized_schedules,
