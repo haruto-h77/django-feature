@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'corsheaders'
+    'corsheaders',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -160,3 +161,5 @@ TEMPLATES[0]['DIRS'] = [
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",  # React開発サーバーのURL
 ]
+
+CORS_ALLOW_ALL_ORIGINS = True  # 本番では制限した方がいい

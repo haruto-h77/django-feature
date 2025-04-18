@@ -41,7 +41,7 @@ class BS4ScheduleForm(forms.ModelForm):
             self.fields['start_date'].widget.attrs['class'] = 'form-control'
             self.fields['start_date'].disabled = True  # disabledでフォーム送信時に値を送信しないようにする
 
-    # 各フィールドに対してのバリデーション確認
+    # 各フィールドに対してのバリデーション確認（HTMLフォームの場合）
     def clean(self):
         cleaned_data = super().clean()
         summary = cleaned_data.get('summary')
