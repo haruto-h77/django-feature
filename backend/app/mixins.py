@@ -4,6 +4,7 @@ import datetime
 import itertools
 from django import forms
 import jpholiday
+from django.utils import timezone
 
 
 
@@ -150,6 +151,8 @@ class WeekCalendarMixin(BaseCalendarMixin):
 class WeekWithScheduleMixin(WeekCalendarMixin):
     """スケジュール付きの、週間カレンダーを提供するMixin"""
 
+    date_field = 'start_datetime'
+
     def get_week_schedules(self, start, end, days):
         """それぞれの日とスケジュールを返す"""
         lookup = {
@@ -163,7 +166,16 @@ class WeekWithScheduleMixin(WeekCalendarMixin):
         day_schedules = {day: [] for day in days}
         for schedule in queryset:
             schedule_date = getattr(schedule, self.date_field)
-            day_schedules[schedule_date].append(schedule)
+            schedule_date = timezone.localtime(schedule_date).date()
+            schedule_enddate = getattr(schedule, 'end_datetime')
+            schedule_enddate = timezone.localtime(schedule_enddate).date()
+
+            # スケジュールの開始日から終了日まで、全ての日にスケジュールを追加
+            while schedule_date <= schedule_enddate:
+                if schedule_date in day_schedules:
+                    # スケジュールの開始日から終了日まで、全ての日にスケジュールを追加
+                    day_schedules[schedule_date].append(schedule)
+                schedule_date += datetime.timedelta(days=1)
         return day_schedules
     
     def get_week_holidays(self, days):
@@ -215,7 +227,7 @@ class WeekWithScheduleMixin(WeekCalendarMixin):
 class MonthWithScheduleMixin(MonthCalendarMixin):
     """スケジュール付きの、月間カレンダーを提供するMixin"""
     
-    date_field = 'date'
+    date_field = 'start_datetime'
 
     def get_month_schedules(self, start, end, days):
         """それぞれの日とスケジュールを返す"""
@@ -230,8 +242,17 @@ class MonthWithScheduleMixin(MonthCalendarMixin):
         day_schedules = {day: [] for week in days for day in week}
         for schedule in queryset:
             schedule_date = getattr(schedule, self.date_field)
-            if schedule_date in day_schedules:
-                day_schedules[schedule_date].append(schedule)
+            schedule_date = timezone.localtime(schedule_date).date()
+            schedule_enddate = getattr(schedule, 'end_datetime')
+            schedule_enddate = timezone.localtime(schedule_enddate).date()
+
+            while schedule_date <= schedule_enddate:
+                if schedule_date in day_schedules:
+                    day_schedules[schedule_date].append(schedule)
+
+                schedule_date += datetime.timedelta(days=1)
+
+
 
         # day_schedules辞書を、周毎に分割する。[{1日: 1日のスケジュール...}, {8日: 8日のスケジュール...}, ...]
         # 7個ずつ取り出して分割しています。

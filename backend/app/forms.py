@@ -7,7 +7,7 @@ class BS4ScheduleForm(forms.ModelForm):
 
     class Meta:
         model = Schedule
-        fields = ('summary', 'description', 'start_date', 'end_date', 'start_time', 'end_time')
+        fields = ('summary', 'description', 'start_datetime', 'end_datetime')
 
         widgets = {
             'summary': forms.TextInput(attrs={
@@ -16,40 +16,36 @@ class BS4ScheduleForm(forms.ModelForm):
             'description': forms.Textarea(attrs={
                 'class': 'form-control',
             }),
-            'start_date': forms.DateInput(attrs={
+            'start_datetime': forms.DateTimeInput(attrs={
                 'class': 'form-control',
-                'type': 'date',
-                'readonly': 'readonly',
-            }),
-            'end_date': forms.DateInput(attrs={
+                'type': 'datetime-local',
+            },
+            format='%Y-%m-%dT%H:%M',
+            ),
+            'end_datetime': forms.DateTimeInput(attrs={
                 'class': 'form-control',
-                'type': 'date',
-            }),
-            'start_time': forms.TextInput(attrs={
-                'class': 'form-control',
-            }),
-            'end_time': forms.TextInput(attrs={
-                'class': 'form-control',
-            }),
+                'type': 'datetime-local',
+            },
+            format='%Y-%m-%dT%H:%M',
+            
+            ),
+            
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # start_dateをreadonlyに設定して変更不可にする
-        if self.instance and self.instance.start_date:
-            self.fields['start_date'].widget.attrs['readonly'] = 'readonly'
-            self.fields['start_date'].widget.attrs['class'] = 'form-control'
-            self.fields['start_date'].disabled = True  # disabledでフォーム送信時に値を送信しないようにする
+        if self.instance and self.instance.start_datetime:
+            self.fields['start_datetime'].widget.attrs['class'] = 'form-control'
+
 
     # 各フィールドに対してのバリデーション確認
     def clean(self):
         cleaned_data = super().clean()
         summary = cleaned_data.get('summary')
         description = cleaned_data.get('description')
-        start_date = cleaned_data.get('start_date')
-        end_date = cleaned_data.get('end_date')
-        start_time = cleaned_data.get('start_time')
-        end_time = cleaned_data.get('end_time')
+        start_datetime = cleaned_data.get('start_datetime')
+        end_datetime = cleaned_data.get('end_datetime')
+
 
         # summaryの文字数チェック
         if summary and len(summary) > 50:
@@ -60,17 +56,12 @@ class BS4ScheduleForm(forms.ModelForm):
             self.add_error('description', '200文字以内で入力してください')
 
         # どれかの日時が未入力の場合
-        if None in (start_date, end_date, start_time, end_time):
+        if None in (start_datetime, end_datetime):
             raise forms.ValidationError('すべての日時を入力してください。')
 
         # 終了日より開始日の方が後の日付に設定されていた場合
-        if end_date < start_date:
-            self.add_error('end_date','終了日が開始日より前に設定されています')
-        
-        if start_date == end_date:
-            # 終了時間と開始時間が同じまたは、開始時間のほうが後に設定されている場合
-            if end_time <= start_time:
-                self.add_error('end_time', '終了時間が開始時間よりも前に設定されています')
+        if end_datetime < start_datetime:
+            self.add_error('end_datetime','終了日時が開始日時より前に設定されています')
         
         return cleaned_data
 
@@ -96,11 +87,11 @@ class ScheduleDetailForm(forms.ModelForm):
     class Meta:
         model = Schedule
         # DBで使うテーブル名を指定
-        fields = ('summary', 'description', 'start_time', 'end_time', 'date')
+        fields = ('summary', 'description', 'start_datetime', 'end_datetime', 'date')
         # 入力ウィジェットのカスタム
         widgets = {
-            'start_time': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
-            'end_time': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
+            'start_datetime': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
+            'end_datetime': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
             'date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'description': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
             'summary': forms.TextInput(attrs={'class': 'form-control'}),
@@ -109,8 +100,8 @@ class ScheduleDetailForm(forms.ModelForm):
         labels = {
             'summary': '概要',
             'description': '詳細',
-            'start_time': '開始時刻',
-            'end_time': '終了時刻',
+            'start_datetime': '開始日時',
+            'end_datetime': '終了日時',
             'date': '日付',
         }
 
@@ -119,8 +110,8 @@ class ScheduleDetailForm(forms.ModelForm):
         summary = cleaned_data.get('summary')
         description = cleaned_data.get('description')
         date = cleaned_data.get('date')
-        start_time = cleaned_data.get('start_time')
-        end_time = cleaned_data.get('end_time')
+        start_datetime = cleaned_data.get('start_datetime')
+        end_datetime = cleaned_data.get('end_datetime')
 
         # summaryの文字数チェック
         if summary and len(summary) > 50:
@@ -131,11 +122,11 @@ class ScheduleDetailForm(forms.ModelForm):
             self.add_error('description', '200文字以内で入力してください')
 
         # 時刻と日付の入力チェック
-        if None in (date, start_time, end_time):
+        if None in (date, start_datetime, end_datetime):
             raise forms.ValidationError('日付・開始時刻・終了時刻をすべて入力してください。')
 
         # 時間の整合性チェック（同日内）
-        if start_time and end_time and end_time <= start_time:
+        if start_datetime and end_datetime and end_datetime <= start_datetime:
             self.add_error('end_time', '終了時間が開始時間よりも前に設定されています')
 
         return cleaned_data

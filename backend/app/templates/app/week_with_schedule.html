@@ -48,7 +48,7 @@
                     {% with day_schedules=week_day_schedules|get_item:day %}
                         {% if day_schedules %}
                             {% for s in day_schedules %}
-                                {{ s.start_time }} - {{ s.end_time }}<br>
+                                {{ s.start_datetime|time:'H:i' }} - {{ s.end_datetime|time:'H:i' }}<br>
                                 <a href="{% url 'app:day' s.date.year s.date.month s.date.day s.pk %}">{{ s.summary }}</a><br>
                                 {{ s.description | urlize | linebreaks }}
                                 {% if not forloop.last %}<hr>{% endif %}

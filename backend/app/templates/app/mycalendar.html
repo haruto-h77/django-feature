@@ -30,16 +30,7 @@
           <div class="col-sm-8">{{ field }} {{ field.errors }}</div>
         </div>
         {% endfor %} {% csrf_token %}
-        <div class="d-flex">
-          <button
-            type="button"
-            id="all-day-btn"
-            class="btn btn-info ml-auto mr-3"
-          >
-            終日
-          </button>
-        </div>
-        <br />
+        
 
         <button type="submit" class="btn btn-primary btn-block">送信</button>
       </form>
@@ -65,24 +56,6 @@
   type="text/css"
   href="https://cdnjs.cloudflare.com/ajax/libs/timedropper/1.0/timedropper.min.css"
 />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/timedropper/1.0/timedropper.min.js"></script>
-<script>
-  $(function () {
-    // timedropper
-    $("#id_start_time").timeDropper({
-      format: "H:mm",
-      setCurrentTime: false,
-    });
-    $("#id_end_time").timeDropper({
-      format: "H:mm",
-      setCurrentTime: false,
-    });
 
-    // 終日ボタンの動作
-    $("#all-day-btn").on("click", function () {
-      $("#id_start_time").val("00:00"); // 開始時間を設定
-      $("#id_end_time").val("23:59"); // 終了時間を設定
-    });
-  });
-</script>
+
 {% endblock %}

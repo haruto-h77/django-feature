@@ -40,12 +40,12 @@
 
         <div class="row mb-3">
             <div class="col-md-6">
-                <label for="id_start_time" class="form-label">開始時間:</label>
-                <input type="time" name="start_time" value="{{ schedule.start_time|time:'H:i' }}" class="form-control" id="id_start_time" required>
+                <label for="id_start_time" class="form-label">開始日時:</label>
+                <input type="datetime-local" name="start_datetime" value="{{ schedule.start_datetime|date:'Y-m-d\TH:i' }}" class="form-control" id="id_start_time" required>
             </div>
             <div class="col-md-6">
-                <label for="id_end_time" class="form-label">終了時間:</label>
-                <input type="time" name="end_time" value="{{ schedule.end_time|time:'H:i' }}" class="form-control" id="id_end_time" required>
+                <label for="id_end_datetime" class="form-label">終了日時:</label>
+                <input type="datetime-local" name="end_datetime" value="{{ schedule.end_datetime|date:'Y-m-d\TH:i' }}" class="form-control" id="id_end_datetime" required>
             </div>
         </div>
     </form>
