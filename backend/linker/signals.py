@@ -96,7 +96,7 @@ def sync_from_todo(sender, instance, created, **kwargs):
                     summary=instance.item_name,
                     description=instance.description,
                     date=dt.date(),
-                    end_datetime=dt,
+                    end_datetime=dt
                     user_id=instance.user.id,
                     is_completed = complete_flug
                 )
