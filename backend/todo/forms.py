@@ -81,12 +81,12 @@ class TodoForm(forms.ModelForm):
         if len(item_name) > 50:
             self.add_error('item_name', '1文字以上、50文字以内で入力してください')
         return item_name
-    # の文字数チェック
-    def clean_(self):
-        description = self.cleaned_data.get("description")
-        if len() > 200:
+    # descriptionの文字数チェック
+    def clean_description(self):
+        description = self.cleaned_data.get('description')
+        if len(description) > 200:
             self.add_error('', '200文字以内で入力してください')
-            return 
+        return description 
     # 期限日に対するバリデーション
     # 形式に合わないデータであればエラー
     def clean_expire_datetime(self):
