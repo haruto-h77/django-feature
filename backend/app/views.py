@@ -210,8 +210,8 @@ def schedule_edit(request, pk):
         if form.is_valid():
             schedule = form.save()
             return redirect(reverse('app:month_with_schedule', kwargs={
-                'year': form.cleaned_data['date'].year,
-                'month': form.cleaned_data['date'].month,
+                'year': form.cleaned_data['start_datetime'].year,
+                'month': form.cleaned_data['start_datetime'].month,
         }))
         else:
             print(form.errors)
