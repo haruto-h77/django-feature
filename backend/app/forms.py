@@ -87,12 +87,11 @@ class ScheduleDetailForm(forms.ModelForm):
     class Meta:
         model = Schedule
         # DBで使うテーブル名を指定
-        fields = ('summary', 'description', 'start_datetime', 'end_datetime', 'date')
+        fields = ('summary', 'description', 'start_datetime', 'end_datetime')
         # 入力ウィジェットのカスタム
         widgets = {
             'start_datetime': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
             'end_datetime': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
-            'date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'description': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
             'summary': forms.TextInput(attrs={'class': 'form-control'}),
         }
@@ -102,14 +101,12 @@ class ScheduleDetailForm(forms.ModelForm):
             'description': '詳細',
             'start_datetime': '開始日時',
             'end_datetime': '終了日時',
-            'date': '日付',
         }
 
     def clean(self):
         cleaned_data = super().clean()
         summary = cleaned_data.get('summary')
         description = cleaned_data.get('description')
-        date = cleaned_data.get('date')
         start_datetime = cleaned_data.get('start_datetime')
         end_datetime = cleaned_data.get('end_datetime')
 
@@ -122,7 +119,7 @@ class ScheduleDetailForm(forms.ModelForm):
             self.add_error('description', '200文字以内で入力してください')
 
         # 時刻と日付の入力チェック
-        if None in (date, start_datetime, end_datetime):
+        if None in (start_datetime, end_datetime):
             raise forms.ValidationError('日付・開始時刻・終了時刻をすべて入力してください。')
 
         # 時間の整合性チェック（同日内）

@@ -110,6 +110,14 @@ class MyCalendar(mixins.MonthCalendarMixin, mixins.WeekWithScheduleMixin, generi
         month_calendar_context = self.get_month_calendar()
         context.update(week_calendar_context)
         context.update(month_calendar_context)
+
+        year = self.kwargs.get('year')
+        month = self.kwargs.get('month')
+        day = self.kwargs.get('day')
+
+        if year and month and day:
+            target_date = datetime.date(int(year), int(month), int(day))
+            context['target_date'] = target_date
         return context
 
     def form_valid(self, form):

@@ -33,13 +33,6 @@
 
         <div class="row mb-3">
             <div class="col-md-6">
-                <label for="id_date" class="form-label">日付:</label>
-                <input type="date" name="date" value="{{ current_day_date|date:'Y-m-d' }}" class="form-control" id="id_date" required>
-            </div>
-        </div>
-
-        <div class="row mb-3">
-            <div class="col-md-6">
                 <label for="id_start_time" class="form-label">開始日時:</label>
                 <input type="datetime-local" name="start_datetime" value="{{ schedule.start_datetime|date:'Y-m-d\TH:i' }}" class="form-control" id="id_start_time" required>
             </div>
