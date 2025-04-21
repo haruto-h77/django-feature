@@ -163,3 +163,14 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True  # 本番では制限した方がいい
+
+# REST_FRAMEWORK
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'backend.app.authentication.JWTAuthentication',     # カレンダー側の認証
+        'backend.todo.authentication.JWTAuthentication',     # Todo側の認証
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',   # 全てのViewで認証必須
+    ],
+}

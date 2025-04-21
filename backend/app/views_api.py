@@ -8,9 +8,11 @@ from .serializers import ScheduleSerializer
 from django.shortcuts import get_object_or_404
 from datetime import date, timedelta, datetime
 import calendar
+from rest_framework.permissions import AllowAny
 
 # 一覧 + 新規作成
 class ScheduleListCreateAPIView(APIView):
+    permission_classes = [AllowAny]  # 誰でもOK（テスト時のみ）
     def get(self, request):
         # 全てのスケジュールを取得
         schedules = Schedule.objects.all()
@@ -30,6 +32,7 @@ class ScheduleListCreateAPIView(APIView):
 
 # 詳細取得 + 更新 + 削除
 class ScheduleDetailAPIView(APIView):
+    permission_classes = [AllowAny]  # 誰でもOK（テスト時のみ）
     # 指定された主キーに一致するScheduleを取得するヘルパー関数
     def get_object(self, pk):
         return get_object_or_404(Schedule, pk=pk)
@@ -63,6 +66,7 @@ class ScheduleDetailAPIView(APIView):
 
 # 月毎のカレンダーを取得する
 class MonthlyCalendarAPI(APIView):
+    permission_classes = [AllowAny]  # 誰でもOK（テスト時のみ）
     def get(self, request):
         # クエリパラメータから年と月を取得
         year = int(request.GET.get('year'))
@@ -104,6 +108,7 @@ class MonthlyCalendarAPI(APIView):
 
 # 週ごとのカレンダーを取得する
 class WeeklyCalendarAPI(APIView):
+    permission_classes = [AllowAny]  # 誰でもOK（テスト時のみ）
     def get(self, request):
         # クエリパラメータから日付を取得
         year = int(request.GET.get('year'))
