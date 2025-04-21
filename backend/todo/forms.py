@@ -83,10 +83,10 @@ class TodoForm(forms.ModelForm):
         return item_name
     # descriptionの文字数チェック
     def clean_description(self):
-        description = self.cleaned_data.get("description")
+        description = self.cleaned_data.get('description')
         if len(description) > 200:
-            self.add_error('description', '200文字以内で入力してください')
-            return description
+            self.add_error('', '200文字以内で入力してください')
+        return description 
     # 期限日に対するバリデーション
     # 形式に合わないデータであればエラー
     def clean_expire_datetime(self):
