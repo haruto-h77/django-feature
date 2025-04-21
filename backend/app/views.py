@@ -28,15 +28,15 @@ class MonthCalendar(mixins.MonthCalendarMixin, generic.TemplateView):
 
         # スケジュール取得：その週に1日でもかかっているもの
         schedules = Schedule.objects.filter(
-            end_date__gte=week_first,
-            start_date__lte=week_last,
+            end_datetime__date__gte=week_first,
+            start_datetime__date__lte=week_last,
         )
 
         # スケジュールを日付ごとに分配
         week_day_schedules = defaultdict(list)
         for schedule in schedules:
-            current = schedule.start_date
-            while current <= schedule.end_date:
+            current = schedule.start_datetime.date()
+            while current <= schedule.end_datetime.date():
                 if week_first <= current <= week_last:
                     week_day_schedules[current].append(schedule)
                 current += timedelta(days=1)
@@ -60,7 +60,7 @@ class WeekWithScheduleCalendar(mixins.WeekWithScheduleMixin, generic.TemplateVie
     """スケジュール付きの週間カレンダーを表示するビュー"""
     template_name = 'app/week_with_schedule.html'
     model = Schedule
-    date_field = 'date'
+    date_field = 'start_datetime'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -75,7 +75,7 @@ class MonthWithScheduleCalendar(mixins.MonthWithScheduleMixin, generic.TemplateV
     """スケジュール付きの月間カレンダーを表示するビュー"""
     template_name = 'app/month_with_schedule.html'
     model = Schedule
-    date_field = 'date'
+    date_field = 'start_datetime'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -89,7 +89,7 @@ class MyCalendar(mixins.MonthCalendarMixin, mixins.WeekWithScheduleMixin, generi
     """月間カレンダー、週間カレンダー、スケジュール登録画面のある欲張りビュー"""
     template_name = 'app/mycalendar.html'
     model = Schedule
-    date_field = 'date'
+    date_field = 'start_datetime'
     form_class = BS4ScheduleForm
 
     def get_initial(self):
@@ -99,8 +99,8 @@ class MyCalendar(mixins.MonthCalendarMixin, mixins.WeekWithScheduleMixin, generi
         day = self.kwargs.get('day')
         if year and month and day:
             target_date = datetime.date(int(year), int(month), int(day))
-            initial['start_date'] = target_date
-            initial['end_date'] = target_date
+            initial['start_datetime'] = target_date
+            initial['end_datetime'] = target_date
         return initial
 
     def get_context_data(self, **kwargs):
@@ -113,50 +113,29 @@ class MyCalendar(mixins.MonthCalendarMixin, mixins.WeekWithScheduleMixin, generi
         return context
 
     def form_valid(self, form):
-        start_date = form.cleaned_data['start_date']
-        end_date = form.cleaned_data['end_date']
+        start_datetime = form.cleaned_data['start_datetime']
+        end_datetime = form.cleaned_data['end_datetime']
         summary = form.cleaned_data['summary']
         description = form.cleaned_data['description']
-        orig_start_time = form.cleaned_data['start_time']
-        orig_end_time = form.cleaned_data['end_time']
+        date = form.cleaned_data['start_datetime'].date()
 
-        current_date = start_date
+        schedule = Schedule(
+            summary=summary,
+            description=description,
+            date=date,
+            start_datetime= start_datetime,
+            end_datetime = end_datetime,
+        )
+        schedule.save()
 
-        while current_date <= end_date:
-            # 日ごとの時間を決定（元の時間を保持しておく）
-            if current_date == start_date and current_date == end_date:
-                daily_start = orig_start_time
-                daily_end = orig_end_time
-            elif current_date == start_date:
-                daily_start = orig_start_time
-                daily_end = time(23, 59, 59)
-            elif current_date == end_date:
-                daily_start = time(0, 0, 0)
-                daily_end = orig_end_time
-            else:
-                daily_start = time(0, 0, 0)
-                daily_end = time(23, 59, 59)
-
-            schedule = Schedule(
-                summary=summary,
-                description=description,
-                date=current_date,
-                start_date=start_date,
-                end_date=end_date,
-                start_time=daily_start,
-                end_time=daily_end,
-            )
-            schedule.save()
-            current_date += timedelta(days=1)
-
-        return redirect(reverse('app:month_with_schedule', args=[start_date.year, start_date.month]))
+        return redirect(reverse('app:month_with_schedule', args=[start_datetime.year, start_datetime.month]))
 
 
 class MonthWithFormsCalendar(mixins.MonthWithFormsMixin, generic.View):
     """フォーム付きの月間カレンダーを表示するビュー"""
     template_name = 'app/month_with_forms.html'
     model = Schedule
-    date_field = 'date'
+    date_field = 'start_datetime'
     form_class = SimpleScheduleForm
 
     def get(self, request, **kwargs):
