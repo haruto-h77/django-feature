@@ -39,8 +39,8 @@ def schedule_reminder_task(sender, instance, created, **kwargs):
     """
     スケジュールが作成または更新されたときにリマインダーをスケジュールします。
     """
-    dt_str = f"{instance.date} {instance.start_time}"
-    scheduled_datetime = make_aware(datetime.strptime(dt_str, "%Y-%m-%d %H:%M:%S"))
+
+    scheduled_datetime = instance.start_datetime
     reminder_time = scheduled_datetime - timedelta(minutes=30)
 
     # 現在時刻を取得

@@ -23,7 +23,7 @@ def sync_from_schedule(sender, instance, created, **kwargs):
             todo = link.todo
             todo.item_name = instance.summary
             todo.description = instance.description
-            todo.expire_datetime = timezone.make_aware(datetime.combine(instance.date, instance.end_time))
+            todo.expire_datetime = instance.end_datetime
             todo.save()
         else:
             todo = Todo.objects.create(
@@ -31,7 +31,7 @@ def sync_from_schedule(sender, instance, created, **kwargs):
                 item_name=instance.summary,
                 description=instance.description,
                 registration_date=instance.created_at,
-                expire_datetime=timezone.make_aware(datetime.combine(instance.date, instance.end_time)),
+                expire_datetime=instance.end_datetime,
             )
             ScheduleTodoLink.objects.create(schedule=instance, todo=todo)
     finally:
@@ -96,7 +96,7 @@ def sync_from_todo(sender, instance, created, **kwargs):
                     summary=instance.item_name,
                     description=instance.description,
                     date=dt.date(),
-                    end_time=dt.time(),
+                    end_datetime=dt,
                     user_id=instance.user.id,
                     is_completed = complete_flug
                 )
@@ -105,7 +105,7 @@ def sync_from_todo(sender, instance, created, **kwargs):
                     summary=instance.item_name,
                     description=instance.description,
                     date=timezone.now().date(),
-                    end_time=datetime.time(7, 0, 0),
+                    end_datetime=datetime,
                     user_id=instance.user.id,
                     is_completed = complete_flug
                 )
