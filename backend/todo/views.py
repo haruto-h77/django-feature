@@ -22,6 +22,8 @@ from django.urls import reverse_lazy
 from django.contrib.auth.models import User
 from .models import Todo
 from django.db.models import Q, ExpressionWrapper, BooleanField, F
+from backend.app.models import Schedule
+from backend.linker.models import ScheduleTodoLink
 # timezone
 from django.utils import timezone
 
@@ -153,13 +155,28 @@ class TodoCompleteView(LoginRequiredMixin, UpdateView):
     # 完了処理成功時のURL
     success_url = reverse_lazy('list')
     # 完了対象であり、ログイン中のユーザーのIDのTodoを取得
+
     def get_object(self):
         return get_object_or_404(Todo, pk=self.request.POST["id"], user=self.request.user)
+    
     # 完了日フィールドを更新する
     def form_valid(self, form):
         todo_form = form.save(commit=False)
         todo_form.finished_date = timezone.now() # 削除処理
         todo_form.save() # 保存する
+
+        # finished_dateの有無で完了フラグを切り替え
+        is_complete = todo_form.finished_date is not None
+        
+        # Todoインスタンスに関連するScheduleを中間テーブル経由で取得
+        linked_schedules = ScheduleTodoLink.objects.filter(todo=todo_form)
+
+        # 関連するScheduleの完了フラグをTrueにする
+        for link in linked_schedules:
+            schedule = link.schedule
+            schedule.is_completed = is_complete
+            schedule.save()
+
         return redirect(reverse_lazy('list'))
 ###
 # 関数ビュー

@@ -75,12 +75,18 @@ class TodoForm(forms.ModelForm):
             if field != "is_finished":
                 self.fields[field].widget.attrs["class"] = "form-control"
     # 項目名に対するバリデーション
-    # 100文字以上になっている場合はエラー
+    # item_nameの文字数チェック
     def clean_item_name(self):
         item_name = self.cleaned_data.get('item_name')
-        if len(item_name) >= 100:
-            self.add_error('item_name', '項目名は100文字以内で入力してください')
+        if len(item_name) > 50:
+            self.add_error('item_name', '1文字以上、50文字以内で入力してください')
         return item_name
+    # descriptionの文字数チェック
+    def clean_description(self):
+        description = self.cleaned_data.get("description")
+        if len(description) > 200:
+            self.add_error('description', '200文字以内で入力してください')
+            return description
     # 期限日に対するバリデーション
     # 形式に合わないデータであればエラー
     def clean_expire_datetime(self):
@@ -98,10 +104,12 @@ class TodoForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         is_finished = cleaned_data.get('is_finished')
+        
         if is_finished:
             cleaned_data['finished_date'] = timezone.now()
         else:
             cleaned_data['finished_date'] = None
+
         return cleaned_data
 
 ###

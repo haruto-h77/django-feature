@@ -38,7 +38,7 @@ class BS4ScheduleForm(forms.ModelForm):
             self.fields['start_datetime'].widget.attrs['class'] = 'form-control'
 
 
-    # 各フィールドに対してのバリデーション確認
+    # 各フィールドに対してのバリデーション確認（HTMLフォームの場合）
     def clean(self):
         cleaned_data = super().clean()
         summary = cleaned_data.get('summary')

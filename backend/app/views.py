@@ -150,6 +150,27 @@ class MonthWithFormsCalendar(mixins.MonthWithFormsMixin, generic.View):
             return redirect('app:month_with_forms')
 
         return render(request, self.template_name, context)
+    
+class DayDetailCalendar(mixins.WeekWithScheduleMixin, generic.TemplateView):
+    """スケジュール付きの日間カレンダーを表示するビュー"""
+    template_name = 'app/dayDetail.html'
+    model = Schedule
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        year = self.kwargs.get('year')
+        month = self.kwargs.get('month')
+        day = self.kwargs.get('day')
+        pk = self.kwargs.get('pk')
+        schedule = get_object_or_404(Schedule, pk=pk, date__year=year, date__month=month, date__day=day)
+        context['schedule'] = schedule
+        
+        try:
+            current_day_date = datetime.date(year, month, day)
+            context['current_day_date'] = current_day_date
+        except ValueError:
+            context['current_day_date'] = None # または Http404 を発生させるなど
+        return context
 
 class DayCalendar(mixins.WeekWithScheduleMixin, generic.TemplateView):
     """スケジュール付きの日間カレンダーを表示するビュー"""

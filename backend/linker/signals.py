@@ -5,6 +5,7 @@ from backend.todo.models import Todo
 from .models import ScheduleTodoLink
 from datetime import datetime
 from django.utils import timezone
+from pytz import timezone as pytz_timezone
 
 # 無限ループ対応
 __sync_flag = {"from_schedule": False, "from_todo": False}
@@ -72,22 +73,32 @@ def sync_from_todo(sender, instance, created, **kwargs):
     __sync_flag["from_todo"] = True
     try:
         link = ScheduleTodoLink.objects.filter(todo=instance).first()
+        # 日本時刻に設定
+        jst = pytz_timezone('Asia/Tokyo')
+        dt = instance.expire_datetime.astimezone(jst)
+        # 完了時刻に値が設定されているか
+        if instance.finished_date:
+            complete_flug = True
+        else:
+            complete_flug = False
         if link:
             schedule = link.schedule
             schedule.summary = instance.item_name
             schedule.description = instance.description
+            schedule.is_completed = complete_flug
             if instance.expire_datetime:
-                schedule.date = instance.expire_datetime.date()
-                schedule.end_datetime = instance.expire_datetime
+                schedule.date = dt.date()
+                schedule.end_time = dt.time()
             schedule.save()
         else:
             if instance.expire_datetime:
                 schedule = Schedule.objects.create(
                     summary=instance.item_name,
                     description=instance.description,
-                    date=instance.expire_datetime.date(),
-                    end_datetime=instance.expire_datetime,
+                    date=dt.date(),
+                    end_datetime=dt,
                     user_id=instance.user.id,
+                    is_completed = complete_flug
                 )
             else:
                 schedule = Schedule.objects.create(
@@ -96,6 +107,7 @@ def sync_from_todo(sender, instance, created, **kwargs):
                     date=timezone.now().date(),
                     end_datetime=datetime,
                     user_id=instance.user.id,
+                    is_completed = complete_flug
                 )
             ScheduleTodoLink.objects.create(schedule=schedule, todo=instance)
     finally:

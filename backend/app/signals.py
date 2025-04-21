@@ -82,6 +82,10 @@ def schedule_reminder_task(sender, instance, created, **kwargs):
             save_task_id(instance, task.id)
         # 条件2: 現在時刻が開始時刻の30分前以降かつ開始時刻より前の場合
         elif reminder_time <= current_time <= scheduled_datetime:
+            # Todo完了フラグがtrueの時はリマインダーを実行しない
+            if instance.is_completed == True:
+                cancel_task_by_id(instance.reminder_task_id, instance.id)  # 念のためキャンセルだけして
+                return
             task = send_reminder.apply_async(
                 args=[instance.id]
             )
