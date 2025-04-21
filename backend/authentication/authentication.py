@@ -2,16 +2,17 @@ from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed
 import jwt
 from .utils import generate_jwt_token  # utils.pyの関数をインポート
-from django.utils.timezone import now
+import json
 
-SETECE_KEY = "your-java-secret-key"
+# Java側の認証キー
+SETECE_KEY = "3a79c0e3f01f4ba8a4bc6ef0df8fa7c1a7c6506a2d3901fbe8e9ce7a6d9a7a89"
 
 # JWT認証の実行ファイル（検証用）
 
 class JWTAuthentication(BaseAuthentication):
     def authenticate(self, request):
         #auth_header = request.headers.get('Authorization') #本番環境
-        auth_header = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE3NDUyMDU2MjB9.zZxga0b91SwVqwmc6xDh4MTy4axpPaDLovv3_CH5XH8"    # テスト用トークン
+        auth_header = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE3NDUyMTk0MTR9.m-GFERA4XherttIzVFOSGiqhViohDgQAY-8iLOKLj_A"    # テスト用トークン
 
         # トークンがない場合 or Bearer形式ではない場合
         if not auth_header or not auth_header.startswith('Bearer '):
@@ -24,7 +25,7 @@ class JWTAuthentication(BaseAuthentication):
         token = auth_header.split(' ')[1]
         try:
             payload = jwt.decode(token, SETECE_KEY, algorithms=['HS256'])
-            print("JWTトークンの中身:", payload)
+            print("JWT認証用のトークン:" + json.dumps(payload))
         except jwt.ExpiredSignatureError:
             raise AuthenticationFailed('トークンの有効期限が切れています')
         except jwt.InvalidTokenError:
