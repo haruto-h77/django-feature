@@ -1,17 +1,13 @@
 {% extends 'app/base.html' %} {% block content %}
 
-<div class="container mt-3">
+<div class="container mt-4">
   <div class="row">
-    <!-- 左側：カレンダー（月） -->
-    <div class="col-md-4">
-      <div class="d-flex flex-column align-items-start">
-        <div class="w-100">{% include 'app/includes/month.html' %}</div>
-        <hr class="w-100" />
-      </div>
-    </div>
+
+
 
     <!-- 右側：フォーム -->
-    <div class="col-md-6 offset-md-1" style="margin-top: 36px">
+    <div class="col-md-6 offset-md-3" style="margin-top: 36px">
+      <h2>新規スケジュール作成</h2>
       <form action="" method="POST">
         {{ form.non_field_errors }} {% for field in form %}
         <div class="form-group row {% if field.errors %}field-error{% endif %}">
@@ -34,19 +30,22 @@
         
 
         <button type="submit" class="btn btn-primary btn-block">送信</button>
+        <br>
+        <button type="button" id="move-to-month", class="btn btn-secondary">
+          <a
+            href="{% url 'app:month_with_schedule' month_current.year month_current.month %}"
+            style="color: white"
+          >
+            戻る</a
+          >
+        </button>
+
       </form>
     </div>
   </div>
 </div>
 
-<button type="button" id="move-to-month", class="btn btn-secondary">
-  <a
-    href="{% url 'app:month_with_schedule' month_current.year month_current.month %}"
-    style="color: white"
-  >
-    戻る</a
-  >
-</button>
+
 {% endblock %} {% block extrajs %}
 <style>
   .field-error input,
