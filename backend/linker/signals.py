@@ -88,7 +88,7 @@ def sync_from_todo(sender, instance, created, **kwargs):
             schedule.is_completed = complete_flug
             if instance.expire_datetime:
                 schedule.date = dt.date()
-                schedule.end_time = dt.time()
+                schedule.end_datetime = dt
             schedule.save()
         else:
             if instance.expire_datetime:
