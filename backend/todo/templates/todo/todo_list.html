@@ -95,7 +95,7 @@
               <form method="POST" class="side" action="{% url 'delete' %}" onclick="event.stopPropagation();">
                 {% csrf_token %}
                 <input type="hidden" name="id" value='{{todo.pk}}'>
-                <button class="btn btn-danger">削除</button>
+                <button class="btn btn-danger btn-delete">削除</button>
               </form>
             </td>
           </tr>
@@ -128,4 +128,20 @@
       >⊕</a
     >
   </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    $(function () {
+      $(".btn-delete").on("click", function (e) {
+        e.stopPropagation(); // テーブルの折りたたみ防止
+        const result = confirm("本当に削除しますか？");
+        if (!result) {
+          e.preventDefault();
+        } else {
+          $(this).closest("form").submit();
+        }
+      });
+    });
+  </script>
+
 {% endblock %}
