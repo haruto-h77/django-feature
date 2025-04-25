@@ -31,14 +31,12 @@
 
         <button type="submit" class="btn btn-primary btn-block">送信</button>
         <br>
-        <button type="button" id="move-to-month", class="btn btn-secondary">
-          <a
-            href="{% url 'app:month_with_schedule' month_current.year month_current.month %}"
-            style="color: white"
-          >
-            戻る</a
-          >
-        </button>
+        <a href="{% url 'app:month_with_schedule' month_current.year month_current.month %}"
+          class="btn btn-secondary"
+          id="move-to-month"
+        >
+          戻る
+      </a>
 
       </form>
     </div>
