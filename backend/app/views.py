@@ -30,7 +30,7 @@ class MonthCalendar(mixins.MonthCalendarMixin, generic.TemplateView):
         schedules = Schedule.objects.filter(
             end_datetime__date__gte=week_first,
             start_datetime__date__lte=week_last,
-        )
+        ).order_by('start_datetime', 'end_datetime')
 
         # スケジュールを日付ごとに分配
         week_day_schedules = defaultdict(list)
