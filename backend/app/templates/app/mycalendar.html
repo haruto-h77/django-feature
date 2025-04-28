@@ -1,22 +1,39 @@
-{% extends 'app/base.html' %} {% block content %}
+{% extends 'app/base.html' %} 
+{% block content %}
 
 <div class="container mt-4">
   <div class="row">
-
-
-
-    <!-- 右側：フォーム -->
     <div class="col-md-6 offset-md-3" style="margin-top: 36px">
       <h2>新規スケジュール作成</h2>
       <form action="" method="POST">
-        {{ form.non_field_errors }} {% for field in form %}
-        <div class="form-group row {% if field.errors %}field-error{% endif %}">
+        {% csrf_token %}
+        
+        {% if form.errors %}
+        <div class="alert alert-danger">
+          <ul class="mb-0">
+            {% for field in form %}
+              {% for error in field.errors %}
+                <li>{{ field.label }}: {{ error }}</li>
+              {% endfor %}
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+        
+        {% for field in form %}
+        <div class="form-group row">
           <label for="{{ field.id_for_label }}" class="col-sm-4 col-form-label">
             {{ field.label_tag }}
           </label>
-          <div class="col-sm-8">{{ field }} {{ field.errors }}</div>
+          <div class="col-sm-8">
+            {{ field }} 
+          </div>
         </div>
-        {% endfor %} {% csrf_token %}
+        {% endfor %}
+
         <div class="d-flex">
           <button
             type="button"
@@ -26,9 +43,7 @@
             終日
           </button>
         </div>
-        <br />
-        
-
+        <br/>
         <button type="submit" class="btn btn-primary btn-block">送信</button>
         <br>
         <a href="{% url 'app:month_with_schedule' month_current.year month_current.month %}"
@@ -36,15 +51,15 @@
           id="move-to-month"
         >
           戻る
-      </a>
-
+        </a>
       </form>
     </div>
   </div>
 </div>
 
+{% endblock %} 
 
-{% endblock %} {% block extrajs %}
+{% block extrajs %}
 <style>
   .field-error input,
   .field-error select,
@@ -63,7 +78,6 @@
   type="text/css"
   href="https://cdnjs.cloudflare.com/ajax/libs/timedropper/1.0/timedropper.min.css"
 />
-
 
 <script>
   $(function () {
@@ -87,6 +101,5 @@
     });
   });
 </script>
-
 
 {% endblock %}
