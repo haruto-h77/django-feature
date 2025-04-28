@@ -6,6 +6,7 @@ from django.utils import timezone
 # ScheduleではなくTodoモデルをインポート
 from .models import Todo
 import logging
+from backend.linker.models import ScheduleTodoLink
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +20,28 @@ def send_todo_reminder(todo_id):
     """Todoのリマインダーメールを送信するタスク"""
     try:
         todo = Todo.objects.get(id=todo_id, is_deleted=False, finished_date__isnull=True) # 未完了かつ未削除のTodoを取得
+        # --- Linkerの作成元チェック ---
+        try:
+            link = ScheduleTodoLink.objects.filter(todo=todo).first()
+            # Linkerが存在し、かつ作成元が 'schedule' だった場合は送信しない
+            if link and link.created_from == 'schedule':
+                logger.info(f"Skipping Todo reminder for {todo_id} because it was originally created from Schedule.")
+                # ★★★ 念のため、関連するSchedule側のタスクIDもクリアしておく (必須ではない) ★★★
+                # if todo.reminder_todo_task_id:
+                #     todo.reminder_todo_task_id = None
+                #     # シグナル経由せずに直接保存
+                #     Todo.objects.filter(id=todo_id).update(reminder_todo_task_id=None)
+                return
+            # Linkerが存在しない場合、または作成元が 'todo' の場合は続行
+            elif link:
+                logger.info(f"Proceeding with Todo reminder for {todo_id} as it was originally created from Todo.")
+            else:
+                logger.info(f"Proceeding with Todo reminder for {todo_id} as it is not linked.")
 
+        except Exception as e:
+            # Linkerチェックでエラーが発生した場合、安全のため送信しない
+            logger.error(f"Error checking linker origin for Todo {todo_id}: {e}", exc_info=True)
+            return
         # 期限日時が存在する場合のみリマインダーを送信
         if todo.expire_datetime:
             # expire_datetime を settings.TIME_ZONE のローカルタイムに変換

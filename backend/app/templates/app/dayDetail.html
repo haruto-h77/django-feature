@@ -1,18 +1,18 @@
-{% extends 'app/base.html' %}
-
-{% block content %}
+{% extends 'app/base.html' %} {% block content %}
 <div class="container mt-4">
-    <h2>スケジュール詳細</h2>
-    
-    <form id="edit-form" method="post" action="{% url 'app:schedule_edit' schedule.pk %}">
-        {% csrf_token %}
+  <h2>スケジュール詳細</h2>
 
-        <div>タイトル:</div>
-        <div class="card mb-3">
-            <div class="card-body">
-                {{ schedule.summary }}
-            </div>
-        </div>
+  <form
+    id="edit-form"
+    method="post"
+    action="{% url 'app:schedule_edit' schedule.pk %}"
+  >
+    {% csrf_token %}
+
+    <div>タイトル:</div>
+    <div class="card mb-3">
+      <div class="card-body">{{ schedule.summary }}</div>
+    </div>
 
         <div>内容:</div>
         <div class="card mb-3">
@@ -39,13 +39,31 @@
                 </div>
             </div>
         </div>
-        
+           <div class="me-2">リマインダー:</div> {# ラベルとバッジの間に少しスペース #}
+    <div> {# バッジをdivで囲む (任意ですが、構造的に分かりやすい) #}
+      {% if schedule.reminder_enabled %}
+      <span class="badge bg-success">有効</span>
+      {% else %}
+      <span class="badge bg-secondary">無効</span>
+      {% endif %}
+    </div>
         
     </form>
 
-    <div class="mt-4">
-        <p><a href="{% url 'app:day' schedule.date.year schedule.date.month schedule.date.day schedule.pk %}" class="btn btn-primary">編集</a></p><br>
-        <a href="{% url 'app:month_with_schedule' year=current_day_date.year month=current_day_date.month %}" class="btn btn-secondary">月表示に戻る</a>
-    </div>
+  <div class="mt-4">
+    <p>
+      <a
+        href="{% url 'app:day' schedule.date.year schedule.date.month schedule.date.day schedule.pk %}"
+        class="btn btn-primary"
+        >編集</a
+      >
+    </p>
+    <br />
+    <a
+      href="{% url 'app:month_with_schedule' year=current_day_date.year month=current_day_date.month %}"
+      class="btn btn-secondary"
+      >月表示に戻る</a
+    >
+  </div>
 </div>
 {% endblock %}
