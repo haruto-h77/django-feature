@@ -128,6 +128,6 @@ class ScheduleDetailForm(forms.ModelForm):
 
         # 時間の整合性チェック（同日内）
         if start_datetime and end_datetime and end_datetime <= start_datetime:
-            self.add_error('end_time', '終了時間が開始時間よりも前に設定されています')
-            
+            self.add_error('end_datetime', '終了時間が開始時間よりも前に設定されています')
+
         return cleaned_data

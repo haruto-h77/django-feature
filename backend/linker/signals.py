@@ -8,15 +8,15 @@ from django.utils import timezone
 from pytz import timezone as pytz_timezone
 
 # 無限ループ対応
-__sync_flag = {"from_schedule": False, "from_todo": False}
+SYNC_FLAG = {"from_schedule": False, "from_todo": False}
 
 # Schedule側でpost_saveされた場合
 @receiver(post_save, sender=Schedule)
 def sync_from_schedule(sender, instance, created, **kwargs):
-    if __sync_flag["from_todo"]:
+    if SYNC_FLAG["from_todo"]:
         return
 
-    __sync_flag["from_schedule"] = True
+    SYNC_FLAG["from_schedule"] = True
     try:
         link = ScheduleTodoLink.objects.filter(schedule=instance).first()
         if link:
@@ -24,6 +24,8 @@ def sync_from_schedule(sender, instance, created, **kwargs):
             todo.item_name = instance.summary
             todo.description = instance.description
             todo.expire_datetime = instance.end_datetime
+            todo.reminder_todo_enabled = instance.reminder_enabled
+
             todo.save()
         else:
             todo = Todo.objects.create(
@@ -32,10 +34,11 @@ def sync_from_schedule(sender, instance, created, **kwargs):
                 description=instance.description,
                 registration_date=instance.created_at,
                 expire_datetime=instance.end_datetime,
+                reminder_todo_enabled=instance.reminder_enabled,
             )
-            ScheduleTodoLink.objects.create(schedule=instance, todo=todo)
+            ScheduleTodoLink.objects.create(schedule=instance, todo=todo,created_from="schedule")
     finally:
-        __sync_flag["from_schedule"] = False
+        SYNC_FLAG["from_schedule"] = False
 
 # Schedule側でpre_deleteされた場合
 @receiver(pre_delete, sender=Schedule)
@@ -52,15 +55,15 @@ def sync_delete_from_schedule(sender, instance, **kwargs):
 # Todo側でpost_saveされた場合
 @receiver(post_save, sender=Todo)
 def sync_from_todo(sender, instance, created, **kwargs):
-    if __sync_flag["from_schedule"]:
+    if SYNC_FLAG["from_schedule"]:
         return
 
     # 論理削除時の処理
     if instance.is_deleted:
-        if __sync_flag["from_todo"]:
+        if SYNC_FLAG["from_todo"]:
             return
         
-        __sync_flag["from_todo"] = True
+        SYNC_FLAG["from_todo"] = True
         try:
             link = ScheduleTodoLink.objects.filter(todo=instance).first()
             if link:
@@ -68,9 +71,9 @@ def sync_from_todo(sender, instance, created, **kwargs):
                 linked_schedule.delete()  # Scheduleを物理削除
             return  # 同期処理はスキップする
         finally:
-            __sync_flag["from_todo"] = False
+            SYNC_FLAG["from_todo"] = False
 
-    __sync_flag["from_todo"] = True
+    SYNC_FLAG["from_todo"] = True
     try:
         link = ScheduleTodoLink.objects.filter(todo=instance).first()
         # 日本時刻に設定
@@ -86,6 +89,7 @@ def sync_from_todo(sender, instance, created, **kwargs):
             schedule.summary = instance.item_name
             schedule.description = instance.description
             schedule.is_completed = complete_flug
+            schedule.reminder_enabled = instance.reminder_todo_enabled
             if instance.expire_datetime:
                 schedule.date = dt.date()
                 schedule.end_datetime = dt
@@ -98,7 +102,8 @@ def sync_from_todo(sender, instance, created, **kwargs):
                     date=dt.date(),
                     end_datetime=dt,
                     user_id=instance.user.id,
-                    is_completed = complete_flug
+                    is_completed = complete_flug,
+                    reminder_enabled=instance.reminder_todo_enabled
                 )
             else:
                 schedule = Schedule.objects.create(
@@ -107,8 +112,13 @@ def sync_from_todo(sender, instance, created, **kwargs):
                     date=timezone.now().date(),
                     end_datetime=datetime,
                     user_id=instance.user.id,
-                    is_completed = complete_flug
+                    is_completed = complete_flug,
+                    reminder_enabled=instance.reminder_todo_enabled
                 )
-            ScheduleTodoLink.objects.create(schedule=schedule, todo=instance)
+            ScheduleTodoLink.objects.create(
+                schedule=schedule,
+                todo=instance,
+                created_from='todo' # Todoから作成された
+            )
     finally:
-        __sync_flag["from_todo"] = False
+        SYNC_FLAG["from_todo"] = False

@@ -41,15 +41,15 @@ class TodoForm(forms.ModelForm):
     class Meta:
         model = Todo
         # どのフィールドを使用するか
-        fields = ('item_name','description','user','expire_datetime','is_finished','finished_date')
+        fields = ('item_name','description','user','expire_datetime', 'reminder_todo_enabled','is_finished','finished_date')
         # フィールドに対するラベル
         labels = {
             'item_name': '項目名',
             'description': '概要',
             'user': '担当者',
+            'reminder_todo_enabled': 'リマインダーを有効にする',
             'expire_datetime': '期限日時',
             'is_finished': '完了',
-            'expire_datetime': '期限日時',
         }
         # 基本的なバリデーション
         error_messages = {
@@ -66,13 +66,14 @@ class TodoForm(forms.ModelForm):
         # ウィジェット
         widgets = {
             'expire_datetime': forms.DateTimeInput(attrs={"type":"datetime-local"}),
+            'reminder_todo_enabled': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
     # 登録時および更新時、初期設定
     def __init__(self,*args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['finished_date'].widget = forms.HiddenInput()
         for field in self.fields:
-            if field != "is_finished":
+            if field != "is_finished" and field != 'reminder_todo_enabled':
                 self.fields[field].widget.attrs["class"] = "form-control"
     # 項目名に対するバリデーション
     # item_nameの文字数チェック
