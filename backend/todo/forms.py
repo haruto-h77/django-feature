@@ -44,8 +44,8 @@ class TodoForm(forms.ModelForm):
         fields = ('item_name','description','user','expire_datetime', 'reminder_todo_enabled','is_finished','finished_date')
         # フィールドに対するラベル
         labels = {
-            'item_name': '項目名',
-            'description': '概要',
+            'item_name': 'タイトル',
+            'description': '内容',
             'user': '担当者',
             'reminder_todo_enabled': 'リマインダーを有効にする',
             'expire_datetime': '期限日時',
