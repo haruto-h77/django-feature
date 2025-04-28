@@ -10,50 +10,54 @@ from .forms import ScheduleDetailForm
 from django.urls import reverse
 from datetime import timedelta, time
 
-class MonthCalendar(mixins.MonthCalendarMixin, generic.TemplateView):
-    """月間カレンダーを表示するビュー"""
-    template_name = 'app/month.html'
+# class MonthCalendar(mixins.MonthCalendarMixin, generic.TemplateView):
+#     """月間カレンダーを表示するビュー"""
+#     template_name = 'app/month.html'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
 
-        week_calendar_context = self.get_week_calendar()
-        month_calendar_context = self.get_month_calendar()
-        context.update(week_calendar_context)
-        context.update(month_calendar_context)
+#         week_calendar_context = self.get_week_calendar()
+#         month_calendar_context = self.get_month_calendar()
+#         context.update(week_calendar_context)
+#         context.update(month_calendar_context)
 
-        # スケジュールの再構築（end_date 跨ぎ対応）
-        week_first = context['week_first']
-        week_last = context['week_last']
+#         # スケジュールの再構築（end_date 跨ぎ対応）
+#         week_first = context['week_first']
+#         week_last = context['week_last']
 
-        # スケジュール取得：その週に1日でもかかっているもの
-        schedules = Schedule.objects.filter(
-            end_datetime__date__gte=week_first,
-            start_datetime__date__lte=week_last,
-        ).order_by('start_datetime', 'end_datetime')
+#         # スケジュール取得：その週に1日でもかかっているもの
+#         schedules = Schedule.objects.filter(
+#             end_datetime__date__gte=week_first,
+#             start_datetime__date__lte=week_last,
+#         ).order_by('start_datetime', 'end_datetime')
 
-        # スケジュールを日付ごとに分配
-        week_day_schedules = defaultdict(list)
-        for schedule in schedules:
-            current = schedule.start_datetime.date()
-            while current <= schedule.end_datetime.date():
-                if week_first <= current <= week_last:
-                    week_day_schedules[current].append(schedule)
-                current += timedelta(days=1)
+#         # スケジュールを日付ごとに分配
+#         week_day_schedules = defaultdict(list)
+#         for schedule in schedules:
+#             current = schedule.start_datetime.date()
+#             while current <= schedule.end_datetime.date():
+#                 if week_first <= current <= week_last:
+#                     week_day_schedules[current].append(schedule)
+#                 current += timedelta(days=1)
+        
+#         # 日付ごとにソート
+#         for day, day_schedules in week_day_schedules.items():
+#             week_day_schedules[day] = sorted(day_schedules, key=lambda x: (x.start_datetime.time(), x.end_datetime.time()))
+        
+#         context['week_day_schedules'] = week_day_schedules
+#         return context
 
-        context['week_day_schedules'] = week_day_schedules
-        return context
 
+# class WeekCalendar(mixins.WeekCalendarMixin, generic.TemplateView):
+#     """週間カレンダーを表示するビュー"""
+#     template_name = 'app/week.html'
 
-class WeekCalendar(mixins.WeekCalendarMixin, generic.TemplateView):
-    """週間カレンダーを表示するビュー"""
-    template_name = 'app/week.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        calendar_context = self.get_week_calendar()
-        context.update(calendar_context)
-        return context
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         calendar_context = self.get_week_calendar()
+#         context.update(calendar_context)
+#         return context
 
 
 class WeekWithScheduleCalendar(mixins.WeekWithScheduleMixin, generic.TemplateView):
