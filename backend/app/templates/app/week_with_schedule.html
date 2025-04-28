@@ -23,15 +23,17 @@
                 <th>{{ w }}</th>
     
                 <!-- 日付リンク付き -->
-                <td {% if now == day %}class="table-success"{% endif %}>
-                    <a href="{% url 'app:mycalendar' day.year day.month day.day %}">
-                        {% if week_first.month != day.month %}
-                            {{ day | date:"m/d" }}
-                        {% else %}
-                            {{ day.day }}
-                        {% endif %}
-                    </a>
+                <td {% if now == day %}class="table-success"{% endif %}
+                    onclick="location.href='{% url 'app:mycalendar' day.year day.month day.day %}'"
+                    style="cursor: pointer;">
+                    {% if week_first.month != day.month %}
+                        {{ day|date:"m/d" }}
+                    {% else %}
+                        {{ day.day }}
+                    {% endif %}
                 </td>
+              
+              
     
                 <!-- スケジュール＆祝日 -->
                 <td>
