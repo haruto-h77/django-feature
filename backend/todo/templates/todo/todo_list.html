@@ -89,7 +89,11 @@
               <form method="POST" class="side" action="{% url 'complete' %}" onclick="event.stopPropagation();">
                 {% csrf_token %}
                 <input type="hidden" name="id" value='{{todo.pk}}'>
-                <button class="btn btn-primary">完了</button>
+                <button class="btn btn-primary"
+                        {% if todo.finished_date %}
+                          disabled
+                        {% endif %}
+                >完了</button>
               </form>
               <button type="button" class="btn btn-success side" onclick="event.stopPropagation(); location.href='{% url "edit" pk=todo.pk %}'">編集</button>
               <form method="POST" class="side" action="{% url 'delete' %}" onclick="event.stopPropagation();">
