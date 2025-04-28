@@ -219,6 +219,14 @@ class WeekWithScheduleMixin(WeekCalendarMixin):
             calendar_context['week_last'],
             week_days
         )
+        # 各日のスケジュールリストを並べ替え
+        if 'week_day_schedules' in calendar_context:
+            for day, schedules in calendar_context['week_day_schedules'].items():
+                # 各日のスケジュールリストを開始日時と終了日時で並べ替え
+                calendar_context['week_day_schedules'][day] = sorted(
+                    schedules, key=lambda x: (x.start_datetime, x.end_datetime)
+                )
+        
         # 祝日取得処理
         calendar_context['week_holidays'] = self.get_week_holidays(week_days)
         return calendar_context
@@ -251,8 +259,12 @@ class MonthWithScheduleMixin(MonthCalendarMixin):
                     day_schedules[schedule_date].append(schedule)
 
                 schedule_date += datetime.timedelta(days=1)
-
-
+        
+        # 各日のスケジュールリストを並べ替え（開始日時→終了日時の順で並べ替え）
+        for day, schedules in day_schedules.items():
+            day_schedules[day] = sorted(
+                schedules, key=lambda x: (x.start_datetime, x.end_datetime)
+            )
 
         # day_schedules辞書を、周毎に分割する。[{1日: 1日のスケジュール...}, {8日: 8日のスケジュール...}, ...]
         # 7個ずつ取り出して分割しています。
