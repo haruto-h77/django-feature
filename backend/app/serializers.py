@@ -33,7 +33,7 @@ class ScheduleSerializer(serializers.ModelSerializer):
         if end_date < start_date:
             raise serializers.ValidationError('終了日が開始日より前に設定されています。')
 
-        if start_date == end_date and end_time <= start_time:
+        if start_date == end_date and end_time < start_time:
             raise serializers.ValidationError('終了時間が開始時間よりも前に設定されています。')
 
         return data
