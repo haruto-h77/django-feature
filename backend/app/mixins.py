@@ -155,15 +155,14 @@ class WeekWithScheduleMixin(WeekCalendarMixin):
 
     def get_week_schedules(self, start, end, days):
         """それぞれの日とスケジュールを返す"""
-        lookup = {
-            # '例えば、date__range: (1日, 31日)'を動的に作る
-            '{}__range'.format(self.date_field): (start, end)
-        }
-        # 例えば、Schedule.objects.filter(date__range=(1日, 31日)) になる
-        queryset = self.model.objects.filter(**lookup).order_by(self.date_field)
+        # 開始日時と終了日時の範囲でフィルタリング
+        queryset = self.model.objects.filter(
+            **{f'{self.date_field}__lte': end,  # 開始日が週の最終日以前
+               'end_datetime__gte': start}  # 終了日が週の開始日以降
+        ).order_by(self.date_field)
 
         # {1日のdatetime: 1日のスケジュール全て, 2日のdatetime: 2日の全て...}のような辞書を作る
-        day_schedules = {day: [] for day in days}
+        day_schedules = {day: [] for day in days}  # 該当週の全ての日をキーにした辞書を初期化
         for schedule in queryset:
             schedule_date = getattr(schedule, self.date_field)
             schedule_date = timezone.localtime(schedule_date).date()
@@ -174,7 +173,7 @@ class WeekWithScheduleMixin(WeekCalendarMixin):
             while schedule_date <= schedule_enddate:
                 if schedule_date in day_schedules:
                     # スケジュールの開始日から終了日まで、全ての日にスケジュールを追加
-                    day_schedules[schedule_date].append(schedule)
+                    day_schedules[schedule_date].append(schedule) 
                 schedule_date += datetime.timedelta(days=1)
         return day_schedules
     
@@ -240,19 +239,23 @@ class MonthWithScheduleMixin(MonthCalendarMixin):
     def get_month_schedules(self, start, end, days):
         """それぞれの日とスケジュールを返す"""
         lookup = {
-            # '例えば、date__range: (1日, 31日)'を動的に作る
-            '{}__range'.format(self.date_field): (start, end)
+            f'{self.date_field}__lte': end,  # スケジュール開始日が月の最終日以前
+            'end_datetime__gte': start, # スケジュール終了日が月の最初日以降
         }
-        # 例えば、Schedule.objects.filter(date__range=(1日, 31日)) になる
+
         queryset = self.model.objects.filter(**lookup).order_by(self.date_field)
 
-        # {1日のdatetime: 1日のスケジュール全て, 2日のdatetime: 2日の全て...}のような辞書を作る
         day_schedules = {day: [] for week in days for day in week}
+        
         for schedule in queryset:
             schedule_date = getattr(schedule, self.date_field)
             schedule_date = timezone.localtime(schedule_date).date()
             schedule_enddate = getattr(schedule, 'end_datetime')
             schedule_enddate = timezone.localtime(schedule_enddate).date()
+
+            # 開始日と終了日を月の範囲内にクリップ
+            schedule_date = max(schedule_date, start)
+            schedule_enddate = min(schedule_enddate, end)
 
             while schedule_date <= schedule_enddate:
                 if schedule_date in day_schedules:
