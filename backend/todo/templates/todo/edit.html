@@ -30,7 +30,7 @@
           
         </div>
         {% else %} {{ field }} {% endif %} {% endfor %}
-        <button type="submit" class="save btn btn-primary">保存</button>
+        <button type="submit" class="save btn btn-primary" id="defencedoublesubmit">保存</button>
         <input
           type="button"
           value="キャンセル"
@@ -41,4 +41,11 @@
     </div>
   </div>
 </div>
+
+<script>
+  const defencedoublesubmit = document.getElementById('defencedoublesubmit');
+  defencedoublesubmit.addEventListener('click', () => {
+    alert("本当に登録しますか？");
+  });
+</script>
 {% endblock %}
