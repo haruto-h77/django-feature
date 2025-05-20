@@ -117,7 +117,7 @@ class TodoUpdateView(LoginRequiredMixin, UpdateView):
     # 編集画面として表示する
     # 編集する予定のTodoを取得して、完了日が入力されているかチェックする
     def get_object(self):
-        query_result = Todo.objects.get(pk=self.kwargs["pk"]) # データを取得する
+        query_result = Todo.objects.filter(pk=self.kwargs["pk"],is_deleted=False).get() # データを取得する
         if query_result.finished_date is None:
             self.is_finished = False
         return query_result
